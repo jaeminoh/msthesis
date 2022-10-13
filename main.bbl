@@ -1,0 +1,85 @@
+\begin{thebibliography}{10}
+
+\bibitem{angrist2018}
+Joshua~D. Angrist, Òscar Jordà, and Guido~M. Kuersteiner.
+\newblock Semiparametric estimates of monetary policy effects: String theory
+  revisited.
+\newblock {\em Journal of Business \& Economic Statistics}, 36(3):371--387,
+  2018.
+
+\bibitem{bojinov2019}
+Iavor Bojinov and Neil Shephard.
+\newblock Time series experiments and causal estimands: Exact randomization
+  tests and trading.
+\newblock {\em Journal of the American Statistical Association},
+  114(528):1665--1682, 2019.
+
+\bibitem{dlnm2010}
+A.~Gasparrini, B.~Armstrong, and M.~G. Kenward.
+\newblock Distributed lag non-linear models.
+\newblock {\em Statistics in Medicine}, 29(21):2224--2234, 2010.
+
+\bibitem{dlnm2010R}
+Antonio Gasparrini.
+\newblock Distributed lag linear and non-linear models in r: The package dlnm.
+\newblock {\em J. Stat. Softw.}, 43(8):1--20, July 2011.
+
+\bibitem{holland1986}
+Paul~W. Holland.
+\newblock Statistics and causal inference.
+\newblock {\em Journal of the American Statistical Association},
+  81(396):945--960, 1986.
+
+\bibitem{hirano2004}
+Guido Imbens and Keisuke Hirano.
+\newblock The propensity score with continuous treatments.
+\newblock 2004.
+
+\bibitem{imbens2000}
+Guido~W. Imbens.
+\newblock The role of the propensity score in estimating dose-response
+  functions.
+\newblock {\em Biometrika}, 87(3):706--710, 2000.
+
+\bibitem{mbb1989}
+Hans~R. Kunsch.
+\newblock {The Jackknife and the Bootstrap for General Stationary
+  Observations}.
+\newblock {\em The Annals of Statistics}, 17(3):1217 -- 1241, 1989.
+
+\bibitem{rosenbaum1983}
+PAUL~R. ROSENBAUM and DONALD~B. RUBIN.
+\newblock {The central role of the propensity score in observational studies
+  for causal effects}.
+\newblock {\em Biometrika}, 70(1):41--55, 04 1983.
+
+\bibitem{rubin1974}
+Donald~B. Rubin.
+\newblock Estimating causal effects of treatments in randomized and
+  nonrandomized studies.
+\newblock {\em Journal of Educational Psychology}, 66:688--701, 1974.
+
+\bibitem{quasipoisson}
+R.~W.~M. WEDDERBURN.
+\newblock {Quasi-likelihood functions, generalized linear models, and the
+  Gauss—Newton method}.
+\newblock {\em Biometrika}, 61(3):439--447, 12 1974.
+
+\bibitem{wu2020sciadv}
+X.~Wu, D.~Braun, J.~Schwartz, M.~A. Kioumourtzoglou, and F.~Dominici.
+\newblock Evaluating the impact of long-term exposure to fine particulate
+  matter on mortality among the elderly.
+\newblock {\em Science Advances}, 6(29):eaba5692, 2020.
+
+\bibitem{gpsboosting2015}
+Ghosh~D. Zhu~Y, Coffman~DL.
+\newblock A boosting algorithm for estimating generalized propensity scores
+  with continuous treatments.
+\newblock {\em Journal of Causal Inference}, 3(1):25--40, 2015.
+
+\bibitem{zivich2022}
+Paul~N Zivich, Stephen~R Cole, and Daniel Westreich.
+\newblock Positivity: Identifiability and estimability.
+\newblock 2022.
+
+\end{thebibliography}
