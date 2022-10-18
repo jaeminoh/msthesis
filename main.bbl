@@ -24,6 +24,17 @@ Antonio Gasparrini.
 \newblock Distributed lag linear and non-linear models in r: The package dlnm.
 \newblock {\em J. Stat. Softw.}, 43(8):1--20, July 2011.
 
+\bibitem{gasparrini2016}
+Antonio Gasparrini.
+\newblock {Modelling Lagged Associations in Environmental Time Series Data: A
+  Simulation Study}.
+\newblock {\em Epidemiology}, 27(6), 2016.
+
+\bibitem{dominici2019sci}
+Gretchen~T. Goldman and Francesca Dominici.
+\newblock Don't abandon evidence and process on air pollution policy.
+\newblock {\em Science}, 363(6434):1398--1400, 2019.
+
 \bibitem{holland1986}
 Paul~W. Holland.
 \newblock Statistics and causal inference.
@@ -59,6 +70,11 @@ Donald~B. Rubin.
   nonrandomized studies.
 \newblock {\em Journal of Educational Psychology}, 66:688--701, 1974.
 
+\bibitem{rubin2008}
+Donald~B. Rubin.
+\newblock {For objective causal inference, design trumps analysis}.
+\newblock {\em The Annals of Applied Statistics}, 2(3):808 -- 840, 2008.
+
 \bibitem{quasipoisson}
 R.~W.~M. WEDDERBURN.
 \newblock {Quasi-likelihood functions, generalized linear models, and the
@@ -70,6 +86,19 @@ X.~Wu, D.~Braun, J.~Schwartz, M.~A. Kioumourtzoglou, and F.~Dominici.
 \newblock Evaluating the impact of long-term exposure to fine particulate
   matter on mortality among the elderly.
 \newblock {\em Science Advances}, 6(29):eaba5692, 2020.
+
+\bibitem{wu2020arxiv}
+Xiao Wu, Fabrizia Mealli, Marianthi-Anna Kioumourtzoglou, Francesca Dominici,
+  and Danielle Braun.
+\newblock Matching on generalized propensity scores with continuous exposures,
+  2018.
+
+\bibitem{sipw2010}
+Stanley Xu, Colleen Ross, Marsha~A. Raebel, Susan Shetterly, Christopher
+  Blanchette, and David Smith.
+\newblock Use of stabilized inverse propensity scores as weights to directly
+  estimate relative risk and its confidence intervals.
+\newblock {\em Value in Health}, 13(2):273--277, 2010.
 
 \bibitem{gpsboosting2015}
 Ghosh~D. Zhu~Y, Coffman~DL.
