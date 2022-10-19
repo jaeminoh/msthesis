@@ -138,7 +138,7 @@ In (marginally) randomized experiment,
 $\mathbb{E}[Y(w)]$ can be estimated from observed data\cite{rubin1974}.
 In observational studies, 
 one can estimate causal estimand $\mu(w) = \mathbb{E}[Y(w)]$ by preprocessing the data to approximate randomization 
-e.g., inverse probability weighting, standardization, matching.\cite{rosenbaum1983}
+e.g., inverse probability weighting, standardization, matching\cite{rosenbaum1983}.
 Among those techniques, 
 common assumptions that makes it possible to estimate the causal estimand are below:
 
@@ -147,11 +147,13 @@ common assumptions that makes it possible to estimate the causal estimand are be
 	Potential outcome for observed treatment is equal to the observed outcome.
 	That is, $Y_t(W_t) = Y_t$.
 \end{asm}
-Without consistency assumption, we cannot know potential outcomes at all.
 
 \begin{asm}[Positivity]\hfill
-
+	Discrete treatment:
 	For all $w$ and $C_t$, $p(w\lvert C_t) = Pr\left ( W_t = w \lvert C_t\right ) \in (0, 1)$.
+
+	Continuous treatment:
+	For all $w$ and $C_t$, $p(w\lvert C_t) > 0$ where $p(w\lvert C_t)$ is a conditional density.
 \end{asm}
 
 
@@ -159,8 +161,12 @@ Without consistency assumption, we cannot know potential outcomes at all.
 
 	For all $w$, $Y_{t}(w) \perp W_t \lvert C_t$.
 \end{asm}
-This assumption says that, conditional on current confounders, potential outcomes are already determined.
-With this, the causal estimand can be calculated as
+
+
+Positivity assumption says all treatments are possible for each confounder.
+Weak unconfoundedness assumption says
+conditional on current confounders, potential outcomes are already determined.
+With these, the causal estimand can be calculated as
 \[
 	\begin{split}
 		\mathbb{E}\left[ Y_t\frac{1_{(W_t = w)}}{p(w\lvert C_t)} \right]
@@ -220,6 +226,7 @@ For $i = 1, \dots, N$ and $t = 1, \dots, T$,
 let $(Y_{i,t}, W_{i,t}, C_{i,t})$ be information of $i$-th region at time $t$.
 $Y$ is daily total death count, $W$ is daily mean temperature 
 and $C$ is (year, month, the week of year, the day of year).
+We rounded daily mean temperature to integer value.
 In the next subsection in which we concentrate on single time series, 
 we will drop $i$ to simpify the notation.
 
@@ -227,10 +234,11 @@ we will drop $i$ to simpify the notation.
 
 The first stage is design stage to adjust for time confounding.
 We adjusted confounding bias by stabilized inverse probability weighting\cite{sipw2010}
-by weighting each observation by 
+that assign weights
 \[
 	q_t = \min{ \left \{ \frac{p(W_t \lvert C_t)}{p(W_t)}, 10 \right \} }
 \]
+to each obsevation.
 Here, we don't know true probability densities,
 so we instead used estimated values.
 One can use normal density as denominator $p(W_t)$,
@@ -262,7 +270,7 @@ regarding each observation as $q_t$ observations with the same values.
 After covariate balance is acheived (for example, AC$<0.1$), 
 we estimated the causal effect by Horvitz-Thompson estimator with stabilized weights,
 \[
-	\hat{\mu}(w) = \frac{\sum_{t = 1}^T q_t Y_t 1_{(W_t = w)}}{\sum_{t = 1}^T q_t}
+	\hat{\mu}(w) = \frac{\sum_{t = 1}^T q_t Y_t 1_{(W_t = w)}}{\sum_{t = 1}^T q_t 1_{(W_t = w)}}
 \]
 With $\hat{\mu}(w)$, we calculaated logRR curve by $\log\hat{\mu}(w) - \log \hat{\mu}(20)$.
 Uncertainty of logRR curve is quantified by Moving Block Bootstrapping (MBB)\cite{mbb1989}.
@@ -344,48 +352,77 @@ in the sense that it becomes similar to the curve of DLNM after kernel smoothing
 
 In the extent of my knowledge, there has been no studies to analyze the short term relationship 
 between the ambient temperature and the all-cause mortality using the potential outcome framework.
+In this work, the causal link between the ambient temperature and mortality 
+is found under the potential outcome framework.
+Consistency between new approach and existing regression method reinforces
+usefulness of regression method, and adds an evidence of causal relationship found by previous studies.
+However, there are some limitations to overcome.
+
 
 \subsection{Limitation}
-When estimating the effect of extreme temperature,
-we heavily relied on very few observations of extreme cases.
-It is the same for previous studies that there are only few extreme temperature observations,
-but they assumed parametric model to the outcome generating process
-so effect estimates at extreme temperature is estimated by borrowing information near the temperature point,
-and it makes extreme cases play somewhat shrinked role.
 
-Since the gps model does not contain other meteorological confounders,
-it may not adjust for other confounding bias.
-We are just looking forward to bias be adjusted by weighting.
-This naive anticipation can be proven after collecting more region level data
-such as economical status, particulate matter, the ratio of elderly, 
-ratio of green land, existence of sea or river nearby, etc.
+In this framework, we could not do several analyses that the DLNM framework can do:
+lagged effect analysis, meta-regression and theoretical confidence interval.
 
-The precision of overall effect was obtained by summing up all precisions from each region,
+The DLNM framework produces exposure-response surface with treatment dimension and lag dimension.
+Therefore, we can easily measure the lagged effect of any treatment level after obtaining the surface.
+In contrast, we estimated the effect of the treatment by using the current outcome variable.
+This can produce only exposure-response curve, 
+since we don't use any information about lagged treatment or lagged outcome.
+Thus our approach does not have ability to measure the lagged effect of the treatment.
+There is a method to measure the lagged effect of the treatment in a single time series\cite{bojinov2019}.
+However, this paper is for binary (sequential) treatment 
+so it is hard to be directly applied to continuous treatment case,
+because of the curse of dimensionality.
+With maximum lag $L$, the number of combinations of possible treatment path is $2^{L+1}$ for binary case
+but there are more than $50$ categories of daily mean temperature 
+so the number of treatment path exceeds $50^{L+1}$.
+Even if $L = 2$, 
+the number of possible combinations of treatment assignment for 3 days exceeds the length of series $8000$.
+Note that we used $L = 21$ for the DLNM framework.
+Since we did not account for lagged effect, someone may say to us that 
+the calculated logRR curve does not represent overall effect but represents instant effect.
+However, due to high autocorrelation of daily mean temperature during short period, 
+we assumed that treatment history would have been almost the same during short period,
+so our effect estimate represents overall effect.
+
+Traditional regression method quantifies its uncertainties based on asymptotic normality,
+because it is fitted by maximizing quasi-likelihood function.
+However, in our case, we quantified the uncertainty of estimated logRR curve by moving block bootstrap
+to include information about temporal correlation.
+This method has a crucial disadvantage.
+When we have only one observation for treatment $w$, its uncertainty based on MBB is zero.
+It contradicts to our intuition that larger sample size gives lower uncertainty.
+We used MBB method because there is no other useful way to estimate standard error of logRR curve.
+The difficulty comes from the definition of RR.
+It is a ratio between two effect estimate, not the difference.
+Moreover, the estimated standard error of pooled logRR curve is not similar to the one from the DLNM framework.
+This is because,
+the precision of overall effect was obtained by summing up all precisions from each region,
 but some regions did not have observations of extremal temperature.
-This leads us to relatively low precision of overall effect estimates in extreme temperature.
+This leads us to relatively low precision of overall effect estimates in extreme temperature
+compared to the precision obtained from the DLNM framework.
 
-There may be a positivity issue, because of serial correlation.
-Theoretically, there is always some chance of extreme temperature because of catastrophic events.
-However that event rarely happens in reality, 
-so stochastic positivity violation\cite{zivich2022} can happen.
-To address this issue, we made normal assumption on gps,
-but the probability of temperature that is far from $m(C)$ is still very small.
-
-When pooling the effect estimates from each region, we just naively took weighted average.
-However, it is well known that the temperature-mortality relationship is heterogeneous across regions.
+%aaaa
+It is well known that the temperature-mortality relationship is heterogeneous across regions. (citation)
 The heterogeneity was usually explained by meta-regression
-that has spline coefficients as response variable, and regional level variables as meta-predictors.
+that has spline coefficients obtained from the DLNM framework as response variable, 
+and regional level variables such as latitude as meta-predictors.
+Intuitively, spline coefficients represents a curve.
+However, we just pooled the effect estimates from each region 
+by naively taking weighted average for each treatment value.
 Our approach reflects heterogeneity across regions by the simple random effect meta-analysis model, 
 but cannot explain this heterogeneity by regional level predictors
-since meta-regression technique is hard to be applied to our effect estimates that are high dimensional.
+since meta-regression technique is hard to be applied to our effect estimates.
 
+GPS modeling:
 When the treatment assignment is conditionally randomized, 
 we can use inverse probability weighting to generate a pseudo-population
 that treatment assignment is marginally randomized.
 I would say in the context of temperature-mortality relationship,
 daily mean temperature is conditionally randomized.
 Because, in the viewpoint of the Earth, 
-the "assignment" mechanism of daily mean temperature is heavily dependent on the meridinal altitude.
+the "assignment mechanism" of daily mean temperature is heavily dependent on the meridinal altitude.
 Moreover, the meridinal altitude is able to be predicted almost perfectly by the date.
 So, we can say that conditional on the date, daily mean temperature is randomly determined
 where the randomness comes from cloud, rain, air mass, typhoon, CO2 emission, global warming, etc.
@@ -393,22 +430,36 @@ It would be very good if we can include those factors into our GPS model,
 but it is impossible because of practical issue.
 Rather, by exploiting the fact that 
 there are so many factors that may have influence on daily mean temperature,
-we assumed normal distribution on the distribution of daily mean temperature 
+we gave normal assumption on the distribution of daily mean temperature 
 based on the central limit theorem.
 
+High variance problem:
+When estimating the effect of extreme temperature,
+we heavily relied on very few observations of extreme cases.
+It is the same for previous studies that there are only few extreme temperature observations,
+but they assumed parametric model to the outcome generating process
+so effect estimates at extreme temperature is estimated by borrowing information near the temperature point,
+and it makes extreme cases play somewhat shrinked role.
+
+Unconfoundesness violation:
+Since the gps model does not contain other potential meteorological confounders,
+it may not adjust for other confounding bias.
+We are just looking forward to bias be adjusted by weighting.
+This naive anticipation can be proven after collecting more region level data
+such as economical status, particulate matter, the ratio of elderly, 
+ratio of green land, existence of sea or river nearby, etc.
+
+Positivity (overlap):
+There may be a positivity issue, because of serial correlation.
+Theoretically, there is always some chance of extreme temperature because of catastrophic events.
+However that event rarely happens in reality, 
+so stochastic positivity violation\cite{zivich2022} can happen.
+To address this issue, we made normal assumption on gps,
+but the probability of temperature that is far from $m(C)$ is still very small.
+
+
+
 \subsection{Future work}
-The primary issue to overcome is the curse of dimensionality.
-Refer to \cite{bojinov2019}, 
-causal time series analysis is investigating the relationship between treatment paths and potential outcomes,
-not just a single treatment and corresponding potential outcomes.
-For binary treatment case, the number of combinations of possible treatment path is $2^{L+1}$,
-where $L$ is the maximum lag.
-However, in the context of temperature-mortality relationship,
-the treatment is continuous so it is hard to consider treatment path
-even after categorizing the treatment to integers.
-In our work, there are $50$ categories of daily mean temperature 
-so the number of treatment path would have been $50^{L+1}$ 
-that is greater than the length of series for $L = 2$.
 
 Even though it is log scale, 
 the estimated effects for cold and hot temperature are quite large compared to previous studies.
