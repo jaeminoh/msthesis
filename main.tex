@@ -1,7 +1,7 @@
 \documentclass[12pt]{article}
 
 %margin
-\usepackage[left=1cm, right=1cm, top=2.5cm, bottom=2.5cm]{geometry}
+\usepackage[left=1.5cm, right=1.5cm, top=2.5cm, bottom=2.5cm]{geometry}
 
 %symbols, fonts
 \usepackage{amsmath, amssymb, amsfonts}
@@ -200,7 +200,7 @@ The second one is PS-unconfoundedness,
 which means that conditional independence of potential outcome and treatment given PS.
 PS-unconfoundedness is implied by balancing property and unconfoundedness.
 These properties are the basis of propensity score based matching methods.
-But in this paper, we used inverse probability weighting so these properties are not needed.
+But in this paper, we used inverse probability weighting so these properties are not necessary.
 
 The main reason why we use inverse probability weighting by GPS is to achieve covariate balance.
 In randomized experiment, distribution of covariates are similar across each treated group.
@@ -220,14 +220,15 @@ compared to the matching method.
 
 \section{Application}
 
-(DATA DESCRIPTION)
+The data has daily mean temperature in the first decimal place, 
+all-cause mortality count during the period from 1997 to 2018 across 36 regions in South Korea.
 
 For $i = 1, \dots, N$ and $t = 1, \dots, T$, 
 let $(Y_{i,t}, W_{i,t}, C_{i,t})$ be information of $i$-th region at time $t$.
 $Y$ is daily total death count, $W$ is daily mean temperature 
 and $C$ is (year, month, the week of year, the day of year).
 We rounded daily mean temperature to integer value.
-In the next subsection in which we concentrate on single time series, 
+During the next subsection in which we concentrate on single time series, 
 we will drop $i$ to simpify the notation.
 
 \subsection{Single series estimate}
@@ -244,7 +245,8 @@ so we instead used estimated values.
 One can use normal density as denominator $p(W_t)$,
 but we used relative frequency as the denominator
 since weighting method with relative frequency achieved 
-lower absolute correlation in this application. (report the difference)
+lower absolute correlation in this application.
+See the second row and third row of Table 1.
 We trimmed weights bigger than $10$ by $10$,
 because some estimated weights were too large so
 effect estimate was heavily dependent to those observations.
@@ -258,8 +260,8 @@ where $m(C)$, and $\sigma(C)$ are some functions of $C$.
 Since they are unknown in general, we should estimate them. 
 The mean $\hat{m}(C)$ is estimated by boosting, 
 and the standard deviation $\hat{\sigma}(C)$ is estimated by boosting residuals\cite{hirano2004, gpsboosting2015}.
-Hyperparameters such as depth of tree, shrinkage, and the number of trees are determined
-to minimize the absolute correlation. (report them)
+Hyperparameters such as depth of tree($3$), shrinkage($0.1$), and the number of trees($20$) 
+are determined heuristically to minimize the absolute correlation.
 
 We calculated absolute correlation (AC)\cite{gpsboosting2015} 
 to see whether the covariate balance is achieved.
@@ -267,7 +269,28 @@ Let $c_t$ be a component of $C_t$, then absolute correlation with weight $q_t$ i
 the absolute value of Pearson correlation coefficient between $c_t$ and $W_t$,
 regarding each observation as $q_t$ observations with the same values.
 
-After covariate balance is acheived (for example, AC$<0.1$), 
+\begin{table}[ht]
+	\centering
+\begin{tabular}{|| c || c | c | c | c || }
+	\hline\hline
+	\ & year & month & the week of year & the day of year \\
+	\hline
+	1 & 0.01405874 & 0.25223312 & 0.25127380 & 0.25115386 \\ %0.43699789 before
+	\hline
+	2 & 0.03168787 & 0.08356729 & 0.08222320 & 0.08186817 \\ %0.45999471 after
+	\hline
+	3 & 0.03033376 & 0.12613061 & 0.12417815 & 0.12356290 \\ %0.42005983 normal marginal
+	\hline\hline
+	
+\end{tabular}
+\caption[Table 1.]
+{Absolute correlation (AC) before/after adjustment by IPW.
+The first row is AC before adjustment;
+the second row is AC after adjustment, with relative frequency of temperature as marginal probability;
+the third row is AC after adjustment, with normal assumption on marginal distribution of temperature.}
+\end{table}
+
+After covariate balance is acheived (here, AC$<0.1$), 
 we estimated the causal effect by Horvitz-Thompson estimator with stabilized weights,
 \[
 	\hat{\mu}(w) = \frac{\sum_{t = 1}^T q_t Y_t 1_{(W_t = w)}}{\sum_{t = 1}^T q_t 1_{(W_t = w)}}
@@ -287,11 +310,11 @@ If we consider the risk difference, then additional suitable normalizing step wi
 
 \subsection{Pooling estimates}
 
-(Assumption 4) - independence of regions
+We assumed $X_i = (Y_{i,t}, W_{i,t}, C_{i,t})_{t = 1}^T$ for $i = 1, \dots, N$ are independent
+and potential outcome of one region is not affected by other regions' potential outcomes and treatments.
 
 For each region $i$, we estimated $\hat{\mu}_i(w)$ in the previous section.
-To obtain aggregated estimate,
-we assumed
+To obtain aggregated estimate, we assumed
 \[
 	\hat{\mu}_i(w) = \mu(w) + \epsilon_i + \tau,
 \]
@@ -350,7 +373,7 @@ in the sense that it becomes similar to the curve of DLNM after kernel smoothing
 
 \section{Discussion}
 
-In the extent of my knowledge, there has been no studies to analyze the short term relationship 
+In the extent of my knowledge, there has been no study analyzing the short term relationship 
 between the ambient temperature and the all-cause mortality using the potential outcome framework.
 In this work, the causal link between the ambient temperature and mortality 
 is found under the potential outcome framework.
@@ -358,11 +381,10 @@ Consistency between new approach and existing regression method reinforces
 usefulness of regression method, and adds an evidence of causal relationship found by previous studies.
 However, there are some limitations to overcome.
 
-
-\subsection{Limitation}
+\subsection{Limitations}
 
 In this framework, we could not do several analyses that the DLNM framework can do:
-lagged effect analysis, meta-regression and theoretical confidence interval.
+lagged effect analysis, theoretical confidence interval, and meta-regression.
 
 The DLNM framework produces exposure-response surface with treatment dimension and lag dimension.
 Therefore, we can easily measure the lagged effect of any treatment level after obtaining the surface.
@@ -403,81 +425,72 @@ but some regions did not have observations of extremal temperature.
 This leads us to relatively low precision of overall effect estimates in extreme temperature
 compared to the precision obtained from the DLNM framework.
 
-%aaaa
 It is well known that the temperature-mortality relationship is heterogeneous across regions. (citation)
 The heterogeneity was usually explained by meta-regression
 that has spline coefficients obtained from the DLNM framework as response variable, 
 and regional level variables such as latitude as meta-predictors.
 Intuitively, spline coefficients represents a curve.
+So meta-regression with coefficients means analyzing the heterogeneity of curve itself across regions.
 However, we just pooled the effect estimates from each region 
 by naively taking weighted average for each treatment value.
-Our approach reflects heterogeneity across regions by the simple random effect meta-analysis model, 
+This approach has two disadvantages compared to the meta-regression.
+The first one is, it does not use the information near that treatment value,
+since we don't have the covariance matrix of estimated effects.
+Another is, our approach reflects heterogeneity across regions by the simple random effect meta-analysis model, 
 but cannot explain this heterogeneity by regional level predictors
 since meta-regression technique is hard to be applied to our effect estimates.
 
-GPS modeling:
+In addition to the weekness compared to the regression method stated above,
+our method has several disadvantages to be addressed:
+incorrect treatment assignment mechanism, high variance, and violation of assumptions.
+
 When the treatment assignment is conditionally randomized, 
 we can use inverse probability weighting to generate a pseudo-population
 that treatment assignment is marginally randomized.
 I would say in the context of temperature-mortality relationship,
 daily mean temperature is conditionally randomized.
-Because, in the viewpoint of the Earth, 
+Because from the viewpoint of the Earth, 
 the "assignment mechanism" of daily mean temperature is heavily dependent on the meridinal altitude.
 Moreover, the meridinal altitude is able to be predicted almost perfectly by the date.
 So, we can say that conditional on the date, daily mean temperature is randomly determined
 where the randomness comes from cloud, rain, air mass, typhoon, CO2 emission, global warming, etc.
-It would be very good if we can include those factors into our GPS model,
+It would be very good if we can include those factors into our GPS model 
+to adjust for confounding bias of such meteorological variables,
 but it is impossible because of practical issue.
 Rather, by exploiting the fact that 
 there are so many factors that may have influence on daily mean temperature,
 we gave normal assumption on the distribution of daily mean temperature 
 based on the central limit theorem.
 
-High variance problem:
-When estimating the effect of extreme temperature,
-we heavily relied on very few observations of extreme cases.
+We estimated logRR curve without any modeling assumption after confounding adjustment.
+Also, the estimator does not borrow information near given treatment value.
+This makes the estimate soley rely on observed values.
+However, we have few observations for extreme temperature.
+So few observations play an important role in effect estimating procedure,
+and it means our approach may have high variance and low bias.
 It is the same for previous studies that there are only few extreme temperature observations,
 but they assumed parametric model to the outcome generating process
-so effect estimates at extreme temperature is estimated by borrowing information near the temperature point,
-and it makes extreme cases play somewhat shrinked role.
+so effect estimates at extreme temperature is a result of borrowing information near the temperature point,
+and it makes extreme cases play somewhat shrinked role compared to our approach,
+which means lower variance and higher bias.
 
-Unconfoundesness violation:
-Since the gps model does not contain other potential meteorological confounders,
-it may not adjust for other confounding bias.
-We are just looking forward to bias be adjusted by weighting.
-This naive anticipation can be proven after collecting more region level data
-such as economical status, particulate matter, the ratio of elderly, 
-ratio of green land, existence of sea or river nearby, etc.
-
-Positivity (overlap):
-There may be a positivity issue, because of serial correlation.
-Theoretically, there is always some chance of extreme temperature because of catastrophic events.
-However that event rarely happens in reality, 
+There is a possibility of violation on two key assumptions in the potential outcome framework.
+The first one is unconfoundedness
+that potential outcome and treatment are independent given measured confounders.
+This assumption may be violated when there is an unmeasured confounder,
+since unmeasured confounder can change the distribution of potential outcome.
+In our case, we cannot measure everything related to temperature-mortality relationship
+so it is plausible to think unconfoundedness assumption is violated.
+The second one is positivity (overlap) assumption
+that any treatment has positive probability of being assigned for each confounder.
+In our case, the confounder is time and 
+there is always some chance of extreme temperature because of catastrophic events in theory.
+However those events rarely happen in reality, 
 so stochastic positivity violation\cite{zivich2022} can happen.
+The reason is we don't have enough sample size.
 To address this issue, we made normal assumption on gps,
-but the probability of temperature that is far from $m(C)$ is still very small.
+and trimmed very small probability to $0.1$ to ensure stability.
 
-
-
-\subsection{Future work}
-
-Even though it is log scale, 
-the estimated effects for cold and hot temperature are quite large compared to previous studies.
-I think they are somewhat exaggerated
-because we used current temperature only to estimate lagged effect ($Y_{t+l} \leftarrow W_t$),
-but previous studies used previous temperature observations 
-to fit the current outcome ($Y_t \leftarrow (W_t, \cdots, W_{t-L})$).
-So our estimated lagged effect must be big due to serial correlation of temperature.
-For example, imagine that daily mean temperature at time $t$ was $W_t$.
-For $t'$ near $t$, say $t' \in (t-L, t+L)$, $W_{t'}$ would have been not much differ to $W_t$.
-This leads ($Y_{t+l} \leftarrow W_t$) to be exaggerated.
-This is kind of small sample size issue that observations are not enough
-to average out the effects of temperatures after $t$.
-One way to remove the bias is divide by suitable coefficient\cite{bojinov2019},
-but there is no standard method to determine the coefficient.
-Further, even if we just use a uniform coefficient,
-there are too many possible combinations of treatment path (we are now dealing with continuous treatment)
-so the coefficient will be zero.
 \bibliography{reference}{}
 \bibliographystyle{plain}
 
