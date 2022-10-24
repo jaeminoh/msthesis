@@ -19,16 +19,28 @@ A.~Gasparrini, B.~Armstrong, and M.~G. Kenward.
 \newblock Distributed lag non-linear models.
 \newblock {\em Statistics in Medicine}, 29(21):2224--2234, 2010.
 
-\bibitem{dlnm2010R}
-Antonio Gasparrini.
-\newblock Distributed lag linear and non-linear models in r: The package dlnm.
-\newblock {\em J. Stat. Softw.}, 43(8):1--20, July 2011.
-
 \bibitem{gasparrini2016}
 Antonio Gasparrini.
 \newblock {Modelling Lagged Associations in Environmental Time Series Data: A
   Simulation Study}.
 \newblock {\em Epidemiology}, 27(6), 2016.
+
+\bibitem{gasparrini2017}
+Antonio Gasparrini, Yuming Guo, Francesco Sera, Ana~Maria Vicedo-Cabrera,
+  Veronika Huber, Shilu Tong, Micheline {de Sousa Zanotti Stagliorio Coelho},
+  Paulo~Hilario {Nascimento Saldiva}, Eric Lavigne, Patricia {Matus Correa},
+  Nicolas {Valdes Ortega}, Haidong Kan, Samuel Osorio, Jan Kyselý, Aleš
+  Urban, Jouni J~K Jaakkola, Niilo R~I Ryti, Mathilde Pascal, Patrick~G
+  Goodman, Ariana Zeka, Paola Michelozzi, Matteo Scortichini, Masahiro
+  Hashizume, Yasushi Honda, Magali Hurtado-Diaz, Julio {Cesar Cruz}, Xerxes
+  Seposo, Ho~Kim, Aurelio Tobias, Carmen Iñiguez, Bertil Forsberg,
+  Daniel~Oudin Åström, Martina~S Ragettli, Yue~Leon Guo, Chang fu~Wu,
+  Antonella Zanobetti, Joel Schwartz, Michelle~L Bell, Tran~Ngoc Dang, Dung~Do
+  Van, Clare Heaviside, Sotiris Vardoulakis, Shakoor Hajat, Andy Haines, and
+  Ben Armstrong.
+\newblock Projections of temperature-related excess mortality under climate
+  change scenarios.
+\newblock {\em The Lancet Planetary Health}, 1(9):e360--e367, 2017.
 
 \bibitem{dominici2019sci}
 Gretchen~T. Goldman and Francesca Dominici.
@@ -51,6 +63,17 @@ Guido~W. Imbens.
 \newblock The role of the propensity score in estimating dose-response
   functions.
 \newblock {\em Biometrika}, 87(3):706--710, 2000.
+
+\bibitem{yoonhee2019}
+Yoonhee Kim, Ho~Kim, Antonio Gasparrini, Ben Armstrong, Yasushi Honda,
+  Yeonseung Chung, Chris Fook~Sheng Ng, Aurelio Tobias, Carmen Íñiguez, Eric
+  Lavigne, Francesco Sera, Ana~M. Vicedo-Cabrera, Martina~S. Ragettli, Noah
+  Scovronick, Fiorella Acquaotta, Bing-Yu Chen, Yue-Liang~Leon Guo, Xerxes
+  Seposo, Tran~Ngoc Dang, Micheline de~Sousa Zanotti Stagliorio~Coelho, Paulo
+  Hilario~Nascimento Saldiva, Anna Kosheleva, Antonella Zanobetti, Joel
+  Schwartz, Michelle~L. Bell, and Masahiro Hashizume.
+\newblock Suicide and ambient temperature: A multi-country multi-city study.
+\newblock {\em Environmental Health Perspectives}, 127(11):117007, 2019.
 
 \bibitem{mbb1989}
 Hans~R. Kunsch.

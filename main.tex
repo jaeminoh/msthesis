@@ -1,7 +1,7 @@
 \documentclass[12pt]{article}
 
 %margin
-\usepackage[left=1.5cm, right=1.5cm, top=2.5cm, bottom=2.5cm]{geometry}
+\usepackage[left=1cm, right=1cm, top=2cm, bottom=2cm]{geometry}
 
 %symbols, fonts
 \usepackage{amsmath, amssymb, amsfonts}
@@ -15,115 +15,96 @@
 %graphic
 \usepackage{graphicx}
 
+%korean
+\usepackage{kotex}
+
 
 \newtheorem{thm}{Theorem}
 \newtheorem{asm}{Assumption}
 
 \author[1]{Jaemin Oh}
-\affil[1]{Department of Mathematical Sciences, KAIST}
+\author[2]{Yeonseung Chung}
+\affil[1,2]{Department of Mathematical Sciences, KAIST}
 
 %1.5 line space
 \linespread{1.5} 
 
-\title{Causal temperature-mortality relationship using time-series data}
+\title{Causal temperature-mortality relationship using time-series data} %
 
 \begin{document}
 
 \maketitle
 %\tableofcontents
 
-\abstract{In this paper, 
-we analyzed the causal relationship between the ambient temperature and all-cause mortality 
-in South Korea using the regional time-series data.}
+\abstract{
+	Temperature-mortality relationship has been analyzed by using regional time series data
+	under the DLNM framework.
+	There has been many concerns about causal interpretation on the temperature-mortality relationship,
+	because of unmeasured confounders, model misspecification, 
+	and mixing of the design and the analysis stages.
+	In this paper, we used the potential outcome framework to deal with latter two issues,
+	and obtained the consistent result compared to the previous studies.
+	This work shines a light on the possibility of causal interpretation on
+	temperature-mortality relationship analyzed so far.
+}
 
+%t-m relationship -> association study during decades -> causality problem -> alternative approach
 \section{Introduction}
 
-Identifying the causal effect of the ambient temperature on human health is 
-an important research topic due to global warming and climate change.
-The best way to identify the causal effect would be observing
-how the change of the ambient temperature affects 
-the change of total death count in one region under Ceteris Paribus condition.
-Note that, perfect Ceteris Paribus condition is only possible
-when we can access to the parallel world that 
-another treatment would have been assigned while other variables are the same.
-However, it is definitely impossible.
-Therefore, we must identify the causal effect by analyzing time series data
-which is a record of date, daily mean temperature, and daily total death count in a region.
-Analysis of this time series data is a challenging task, because of several reasons:
-the ambient temperature is continuous treatment, so the size of the effect may be differ for each temperature;
-the effect of the ambient temperature may be delayed;
-serial correlation of daily mean temperature makes difficult to separate instant and delayed effect;
-daily death count has a temporal trend, it increases as the population size increases.
-In previous studies (Gapsparrini, Guo, etc), these difficulties were addressed by 
-the combination of the DLNM framework\cite{dlnm2010}
-and the quasi-Poisson regression\cite{quasipoisson} that produces exposure-response surface
-$\mu : (w, l) \mapsto \mu(w,l)$ where $w$ is the ambient temperature and $l$ is a time lag.
-
-The DLNM framework has many advantages:
-it summarizes the information of the RR curve by spline coefficients,
-so multivariate meta-analysis is possible;
+Due to global warming and climate change,
+analyzing the effect of the ambient temperature on human health is an important research topic
+\cite{gasparrini2017, yoonhee2019}(Gasparrini lancet, 김윤희 교수님 EHP more?).
+Usually, the relationship has been analyzed by using regional time series data.
+There are difficulties in analyzing the relationship with time series data, such as 
+temporal trend of outcomes, and the existence of delayed effect.
+These difficulties have been addressed by the DLNM framework\cite{dlnm2010}
+which used the quasi-Poisson regression\cite{quasipoisson} to estimate coefficients.
+It produces exposure-response surface
+$\mu : (w, l) \mapsto \mu(w,l) \in \mathbb{R}$ where $w$ is the ambient temperature and $l$ is a time lag.
+Such regression analyses have some advantages:
 lagged effect can be easily identified;
-well developed R-package is available\cite{dlnm2010R}.
-These advantages make the DLNM framework popular in environmental epidemiology,
+it summarizes the information of the curve representing relative risk (RR) by spline coefficients,
+so meta-analysis is possible with considering the covariance of effects at different temperatures.
+These advantages make regression approach popular in environmental epidemiology,
 especially for the topic of temperature-mortality relationship.
-However, model selection in the DLNM framework is quite complicated 
-so we may say that it is susceptible to model misspecification\cite{gasparrini2016}.
-It eliminates temporal trend of death count by fitting additional spline for each year,
-and it requires determination of degrees of freedom for each spline base.
-Also we never know the exact degrees of freedom 
-and placement of knots for spline bases of the ambient temperature.
-Those values can be determined based on the previous studies, 
-or Akaike information criterion\cite{dlnm2010}.
 
-There was a debate on air pollution study 
-that usual regression approach to analyze the health effect of particulate matter 
-does not inform causality very well\cite{dominici2019sci}.
-One reason is, as stated above, model selection problem
-and another reason is mixing of design stage and analysis stage.
-Rubin said that final outcome data should not be used in design stage without some exceptions\cite{rubin2008}.
-Here, in the context of the DLNM framework,
-design stage is fitting splines for each year to adjust confounding bias, 
-and analysis stage is fitting the cross basis to the data.
-The DLNM framework is done by doing Poisson regression to the data,
-stated concerns about regression analysis is still valid in temperature-mortality relationship.
+However, there has been a concern about causal interpretation 
+on the results obtained by regression analysis.
+Obviously, the primary issue is the existence of unmeasured confounders
+that cannot be solved without collecting additional data.
+Additionally, in recent debate on air pollution study\cite{dominici2019sci},
+two aspects of regression analysis were pointed out:
+mixing of design stage and analysis stage 
+that uses outcomes in confounding bias adjustment\cite{rubin2008}
+and model misspecification problem.
+In fact, these problems remain the same in the context of the temperature mortality relationship;
+the DLNM framework mixes design stage and analysis stage,
+since it fits additional spline for each year to adjust for temporal confounding;
+it is susceptible to model misspecification\cite{gasparrini2016}
+since we don't know the exact placement of knots and the exact degrees of freedom.
+Therefore, these two problems should be solved first to make causal interpretation possible.
 
-A model that separates design and analysis stage is Rubin causal model (RCM)\cite{holland1986}.
-It is about how to compare counterfactual outcomes of another parallel world, 
-without access to the parallel world under suitable assumptions.
+As a solution, we suggests to use Rubin causal model (RCM)\cite{holland1986}
+known as the potential outcome framework.
+It separates the design stage and the analysis stage,
+and does not need any parametric model to outcome generating process,
+so it is more free to model misspecification.
 The potential outcome framework was first introduced 
 to analyze the data of randomized experiments\cite{rubin1974},
-but now widely used in observational studies\cite{wu2020sciadv}.
-Furthermore, the potential outcome framework is more free 
-to the problem of model misspecification than the traditional approach, 
-because it is in some sense "semi-parametric" 
-that does not require parametric model for outcome generating process.\cite{angrist2018} 
-So in this paper, we used potential outcome framework 
-to estimate logRR curve of the ambient temperature.
-
-Usually, the potential outcome framework is applied to individual level data. 
-For example, analyzing treatment effect of new medicine. 
-However, it is hard to earn individual level data for temperature-mortality relationship,
-to say that the true cause of death was the ambient temperature, 
-and to analyze short-term effect on individual level. 
-Therefore we used regional data instead of individual level data.
+but now widely used in observational studies\cite{wu2020sciadv},
+and even in time series data\cite{angrist2018}.
+In this paper, we used potential outcome framework to estimate logRR curve of the ambient temperature 
+and compared the result to the DLNM framework.
 
 \section{Method}
 
 The state of a region at time $t$ can be described by $(Y_t, W_t, C_t)$ 
-where $Y_t$ is a vector of outcome, $W_t$ is a treatment, and $C_t$ is a vector of confounders.
-
-In regression settings, we usually have fitted the model:
-\[
-	g\left( \mathbb{E}\left[ Y_t \lvert W_t, C_t \right] \right) = s(W_t)\beta + \eta(C_t)\gamma
-\]
-where $g$ is a link function and $(s,\gamma)$ are bases of function space, such as spline bases.
-However, as described before, regression approaches inform weak causality 
-because of mixing of design and analysis stages and model selection problem.
-To deal with this problem, we used potential outcome framework with nonparametric effect estimator.
+where $Y_t$ is a vector of outcome, $W_t$ is daily mean temperature, 
+and $C_t$ is a vector of confounders.
 
 \subsection{Conceptual framework}
 
-What would be the value of $Y_t$ if $W_t = w'$ had been observed instead of $W_t = w$?
+What would be the value of $Y_t$ if $W_t = w'$ had been observed instead of $W_t = w$? %confounder?
 The outcome of this counterfactual imagination is called potential outcome and written as $Y_t(w')$.
 If we know true value of $Y_t(w)$ and $Y_t(w')$, we can get the relative risk of $w$ against $w'$ by
 \[
@@ -220,7 +201,10 @@ compared to the matching method.
 
 \section{Application}
 
-The data has daily mean temperature in the first decimal place, 
+% big subject
+
+%plottings
+The data has daily mean temperature in the first decimal place, and
 all-cause mortality count during the period from 1997 to 2018 across 36 regions in South Korea.
 
 For $i = 1, \dots, N$ and $t = 1, \dots, T$, 
@@ -228,11 +212,20 @@ let $(Y_{i,t}, W_{i,t}, C_{i,t})$ be information of $i$-th region at time $t$.
 $Y$ is daily total death count, $W$ is daily mean temperature 
 and $C$ is (year, month, the week of year, the day of year).
 We rounded daily mean temperature to integer value.
-During the next subsection in which we concentrate on single time series, 
-we will drop $i$ to simpify the notation.
+
+% didn't mention about meta-analysis, move up to the application section.
+To compare estimate obtained above to the previous studies, we fitted DLNM to our data.
+For temperature dimension, 
+we used quadratic B-spline, and placed knots at 10th, 75th, 90th quantiles.
+For lag dimension,
+we considered $21$ lags, used natural B-spline, and placed $3$ knots at equally spaced log values.
+For temporal trend adjustment,
+we fitted additional natural B-spline with $8$ degrees of freedom for each year.
 
 \subsection{Single series estimate}
 
+In this subsection in which we concentrate on single time series, 
+we will drop $i$ to simpify the notation.
 The first stage is design stage to adjust for time confounding.
 We adjusted confounding bias by stabilized inverse probability weighting\cite{sipw2010}
 that assign weights
@@ -329,14 +322,6 @@ Confidence interval is obtained by adding (or subtracting)
 $1.96$ times of pooled standard deviation $\hat{\sigma}$ to pooled logRR curve.
 
 \subsection{Result}
-
-To compare estimate obtained above to the previous studies, we fitted DLNM to our data.
-For temperature dimension, 
-we used quadratic B-spline, and placed knots at 10th, 75th, 90th quantiles.
-For lag dimension,
-we considered $21$ lags, used natural B-spline, and placed $3$ knots at equally spaced log values.
-For temporal trend adjustment,
-we fitted additional natural B-spline with $8$ degrees of freedom for each year.
 
 In figure 1,
 the upper left panel is a logRR curve obtained under the DLNM framework;
@@ -491,7 +476,11 @@ The reason is we don't have enough sample size.
 To address this issue, we made normal assumption on gps,
 and trimmed very small probability to $0.1$ to ensure stability.
 
+
 \bibliography{reference}{}
 \bibliographystyle{plain}
+
+
+
 
 \end{document}
