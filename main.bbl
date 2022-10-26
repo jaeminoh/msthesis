@@ -81,6 +81,11 @@ Hans~R. Kunsch.
   Observations}.
 \newblock {\em The Annals of Statistics}, 17(3):1217 -- 1241, 1989.
 
+\bibitem{whatif2020}
+Hernán MA and Robins JM.
+\newblock {\em Causal Inference: What If}.
+\newblock Chapman \& Hall/CRC, 2020.
+
 \bibitem{rosenbaum1983}
 PAUL~R. ROSENBAUM and DONALD~B. RUBIN.
 \newblock {The central role of the propensity score in observational studies
@@ -93,10 +98,11 @@ Donald~B. Rubin.
   nonrandomized studies.
 \newblock {\em Journal of Educational Psychology}, 66:688--701, 1974.
 
-\bibitem{rubin2008}
+\bibitem{rubin2007sim}
 Donald~B. Rubin.
-\newblock {For objective causal inference, design trumps analysis}.
-\newblock {\em The Annals of Applied Statistics}, 2(3):808 -- 840, 2008.
+\newblock The design versus the analysis of observational studies for causal
+  effects: parallels with the design of randomized trials.
+\newblock {\em Statistics in Medicine}, 26(1):20--36, 2007.
 
 \bibitem{quasipoisson}
 R.~W.~M. WEDDERBURN.
@@ -109,12 +115,6 @@ X.~Wu, D.~Braun, J.~Schwartz, M.~A. Kioumourtzoglou, and F.~Dominici.
 \newblock Evaluating the impact of long-term exposure to fine particulate
   matter on mortality among the elderly.
 \newblock {\em Science Advances}, 6(29):eaba5692, 2020.
-
-\bibitem{wu2020arxiv}
-Xiao Wu, Fabrizia Mealli, Marianthi-Anna Kioumourtzoglou, Francesca Dominici,
-  and Danielle Braun.
-\newblock Matching on generalized propensity scores with continuous exposures,
-  2018.
 
 \bibitem{sipw2010}
 Stanley Xu, Colleen Ross, Marsha~A. Raebel, Susan Shetterly, Christopher

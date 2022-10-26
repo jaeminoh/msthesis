@@ -29,12 +29,15 @@
 %1.5 line space
 \linespread{1.5} 
 
-\title{Causal temperature-mortality relationship using time-series data} %
+\title{
+	Causal inference on temperature-mortality relationship using time-series data: 
+	comparing the potential outcome framework and regression analysis
+	} %
 
 \begin{document}
 
 \maketitle
-%\tableofcontents
+\tableofcontents
 
 \abstract{
 	Temperature-mortality relationship has been analyzed by using regional time series data
@@ -48,16 +51,16 @@
 	temperature-mortality relationship analyzed so far.
 }
 
-%t-m relationship -> association study during decades -> causality problem -> alternative approach
 \section{Introduction}
 
 Due to global warming and climate change,
 analyzing the effect of the ambient temperature on human health is an important research topic
-\cite{gasparrini2017, yoonhee2019}(Gasparrini lancet, 김윤희 교수님 EHP more?).
+\cite{gasparrini2017, yoonhee2019}(Gasparrini lancet, 김윤희 교수님 EHP. need more?).
 Usually, the relationship has been analyzed by using regional time series data.
 There are difficulties in analyzing the relationship with time series data, such as 
 temporal trend of outcomes, and the existence of delayed effect.
-These difficulties have been addressed by the DLNM framework\cite{dlnm2010}
+These difficulties have been addressed by 
+the distributed lag nonlinear effect model (DLNM) framework\cite{dlnm2010}
 which used the quasi-Poisson regression\cite{quasipoisson} to estimate coefficients.
 It produces exposure-response surface
 $\mu : (w, l) \mapsto \mu(w,l) \in \mathbb{R}$ where $w$ is the ambient temperature and $l$ is a time lag.
@@ -75,7 +78,7 @@ that cannot be solved without collecting additional data.
 Additionally, in recent debate on air pollution study\cite{dominici2019sci},
 two aspects of regression analysis were pointed out:
 mixing of design stage and analysis stage 
-that uses outcomes in confounding bias adjustment\cite{rubin2008}
+that uses outcomes in confounding bias adjustment\cite{rubin2007sim}
 and model misspecification problem.
 In fact, these problems remain the same in the context of the temperature mortality relationship;
 the DLNM framework mixes design stage and analysis stage,
@@ -96,40 +99,58 @@ and even in time series data\cite{angrist2018}.
 In this paper, we used potential outcome framework to estimate logRR curve of the ambient temperature 
 and compared the result to the DLNM framework.
 
+The paper proceeds as follows: 
+in Section 2, we describe settings and assumptions of the potential outcome framework.
+In Section 3, we apply the method suggested in section 2 and regression method 
+to regional time-series data and compare the results.
+Finally, we discuss pros and cons of 
+the application of the potential outcome framework to analyze the temperature-mortality relationship.
+
 \section{Method}
 
 The state of a region at time $t$ can be described by $(Y_t, W_t, C_t)$ 
-where $Y_t$ is a vector of outcome, $W_t$ is daily mean temperature, 
+where $Y_t$ is a vector of observed outcome, $W_t$ is daily mean temperature, 
 and $C_t$ is a vector of confounders.
 
-\subsection{Conceptual framework}
+Now we introduce the notation of potential outcomes.
+$Y_t(w)$ refers to the outcome variable at time $t$
+that would have been observed under the treatment value $W_t = w$.
+$Y_t(w')$ is the outcome variable that would have been obeserved by the counterfactual imagination
+that $W_t = w'$ had been observed instead of $W_t = w$.
+Observed outcome $Y_t$ is equal to the potential outcome under observed treatment value, $Y_t(W_t)$.
+This is called consistency assumption \ref{asm:consistency}.
+See the reference\cite{whatif2020} for more detailed explanation about the definition.
 
-What would be the value of $Y_t$ if $W_t = w'$ had been observed instead of $W_t = w$? %confounder?
-The outcome of this counterfactual imagination is called potential outcome and written as $Y_t(w')$.
-If we know true value of $Y_t(w)$ and $Y_t(w')$, we can get the relative risk of $w$ against $w'$ by
+We might be interested in the individual risk ratio
 \[
-	\frac{Y_t(w)}{Y_t(w')} \text{ or } 
+	\frac{Y_t(w)}{Y_t(w')}
+\]
+if we know true values of $Y_t(w)$ and $Y_t(w')$.
+However, we never know the true potential outcomes of unmeasured treatment, 
+due to its counterfactual nature.
+This is called the fundamental problem of causal inference\cite{holland1986}.
+Instead, we concentrate on the average risk ratio
+\[
 	\frac{\mathbb{E}\left[ Y_t(w) \right]}{\mathbb{E}\left[ Y_t(w') \right]}.
 \]
-However, we never know the true $Y_t(w)$, due to its counterfactual nature.
-This is called the fundamental problem of causal inference\cite{holland1986}.
-
-There has been many studies to address this problem.
-In (marginally) randomized experiment, 
-$\mathbb{E}[Y(w)]$ can be estimated from observed data\cite{rubin1974}.
+There has been many studies to estimate $\mathbb{E}[Y_t(w)]$.
+In marginally randomized experiment, 
+$\mu(w) = \mathbb{E}[Y(w)]$ can be estimated from observed data\cite{rubin1974}.
 In observational studies, 
-one can estimate causal estimand $\mu(w) = \mathbb{E}[Y(w)]$ by preprocessing the data to approximate randomization 
+one can estimate causal estimand $\mu(w)$ by preprocessing the data to approximate randomization 
 e.g., inverse probability weighting, standardization, matching\cite{rosenbaum1983}.
-Among those techniques, 
-common assumptions that makes it possible to estimate the causal estimand are below:
+Note that we dropped the subscript $t$ to indicate more general situation than time-series setting.
+Throughout those techniques, 
+the fundamental assumptions that make it possible to estimate the causal estimand are below:
 
-\begin{asm}[Consistency]\hfill
+\begin{asm}[Consistency]\label{asm:consistency}\hfill
 
 	Potential outcome for observed treatment is equal to the observed outcome.
 	That is, $Y_t(W_t) = Y_t$.
 \end{asm}
 
 \begin{asm}[Positivity]\hfill
+
 	Discrete treatment:
 	For all $w$ and $C_t$, $p(w\lvert C_t) = Pr\left ( W_t = w \lvert C_t\right ) \in (0, 1)$.
 
@@ -145,26 +166,28 @@ common assumptions that makes it possible to estimate the causal estimand are be
 
 
 Positivity assumption says all treatments are possible for each confounder.
-Weak unconfoundedness assumption says
-conditional on current confounders, potential outcomes are already determined.
-With these, the causal estimand can be calculated as
+Weak unconfoundedness assumption, 
+also known as "weak ignorability" or "selection on observables" in different context, says
+conditional on current confounders, assignment mechanism is random to potential outcomes.
+Under these three assumptions, the causal estimand can be calculated as
 \[
 	\begin{split}
 		\mathbb{E}\left[ Y_t\frac{1_{(W_t = w)}}{p(w\lvert C_t)} \right]
 		& = \mathbb{E}\left[ \mathbb{E}\left( Y_t(w) \frac{1_{(W_t = w)}}{p(w\lvert C_t)} \lvert C_t\right)\right]\\
 		& = \mathbb{E}\left[ Y_t(w)\frac{\mathbb{E}\left( 1_{(W_t = w)}\lvert C_t \right)}{p(w\lvert C_t)} \right]\\
-		& = E\left[ Y_t(w) \right].
+		& = E\left[ Y_t(w) \right] = \mu(w),
 	\end{split}
 \]
+where $p$ is a mass or density function for discrete or continuous treatment respectively.
+Note that the first equality comes from the interated expectation formula and consistency assumption,
+the second equality comes from weak unconfoundedness assumption,
+and the third equality is due to the definition of $p(w\lvert C_t)$.
+By positivity assumption, we can divide by $p(w\lvert C_t)$.
 This is called "inverse probability weighting" (IPW).
 Thus, a natural estimator of the causal estimand is
 \[
 	\hat{\mu}(w) = \frac{1}{T}\sum_{t = 1}^T Y_t \frac{1_{(W_t = w)}}{p(w\lvert C_t)}.	
 \]
-Note that the first equality comes from the interated expectation formula and consistency assumption,
-the second equality comes from weak unconfoundedness assumption,
-and the last equality is due to the definition of $p(w\lvert C_t)$.
-By positivity assumption, we can divide by $p(w\lvert C_t)$.
 
 Still, we need to estimate $p(w\lvert C_t)$ since it is unknown to us in general.
 When the treatment is binary, $p(w\lvert C_t)$ is called propensity score,
@@ -181,92 +204,90 @@ The second one is PS-unconfoundedness,
 which means that conditional independence of potential outcome and treatment given PS.
 PS-unconfoundedness is implied by balancing property and unconfoundedness.
 These properties are the basis of propensity score based matching methods.
-But in this paper, we used inverse probability weighting so these properties are not necessary.
+But in this paper, 
+we used inverse probability weighting so these properties are not necessary to be explained more.
 
 The main reason why we use inverse probability weighting by GPS is to achieve covariate balance.
 In randomized experiment, distribution of covariates are similar across each treated group.
-However, we are now dealing with observational data 
-so we are looking forward to achieve covariate balance on pseudo-population generated by
-imposing appropriate weights to each observation.
+However, we are now dealing with observational data which is not randomized.
+So, we generate a pseudo-population by imposing appropriate weights to each observation
+and look forward to the pseudo-population achieve covariate balance.
 One criteria for covariate balance is the absolute correlation (AC)\cite{gpsboosting2015}.
 If treatment and covariates are independent, then their correlation must be zero.
-So, small value of AC can be an one possible evidence of covariate balance.
+So, small value of AC can be an evidence of covariate balance.
 Usually, AC with $ <0.1 $ is considered as acceptible.
-
-In fact, matching method to adjust confounding bias is available for continuous treatment data\cite{wu2020arxiv}.
-However, in our case, extreme temperatures are rarely observed,
-so matching estimator can heavily depend on such observations and can lead exaggerated effect estimate.
-Instead, in IPW method, too large weight is trimmed so it will produce less exaggerated estimate
-compared to the matching method.
 
 \section{Application}
 
-% big subject
-
 %plottings
-The data has daily mean temperature in the first decimal place, and
+The data is composed of daily mean temperature in the first decimal place, and
 all-cause mortality count during the period from 1997 to 2018 across 36 regions in South Korea.
+In figure \ref{figure:temporal-trend},
+we can observe that there is an increasing trend in 
+both yearly maximum of daily mean temperature and yearly total death count.
+\begin{figure}
+	\includegraphics[width = \textwidth]{figures/temporal-trend.pdf}
+	\caption{Temporal trend of yearly maximum of daily mean temperature and total death count.}
+	\label{figure:temporal-trend}
+\end{figure}
 
-For $i = 1, \dots, N$ and $t = 1, \dots, T$, 
+
+
+
+For $i = 1, \dots, N(=36)$ and $t = 1, \dots, T(=8054)$, 
 let $(Y_{i,t}, W_{i,t}, C_{i,t})$ be information of $i$-th region at time $t$.
 $Y$ is daily total death count, $W$ is daily mean temperature 
-and $C$ is (year, month, the week of year, the day of year).
+and $C$ is a vector of year, month of the year, week of the year, and day of the year.
 We rounded daily mean temperature to integer value.
-
-% didn't mention about meta-analysis, move up to the application section.
-To compare estimate obtained above to the previous studies, we fitted DLNM to our data.
-For temperature dimension, 
-we used quadratic B-spline, and placed knots at 10th, 75th, 90th quantiles.
-For lag dimension,
-we considered $21$ lags, used natural B-spline, and placed $3$ knots at equally spaced log values.
-For temporal trend adjustment,
-we fitted additional natural B-spline with $8$ degrees of freedom for each year.
 
 \subsection{Single series estimate}
 
 In this subsection in which we concentrate on single time series, 
 we will drop $i$ to simpify the notation.
+
 The first stage is design stage to adjust for time confounding.
 We adjusted confounding bias by stabilized inverse probability weighting\cite{sipw2010}
 that assign weights
 \[
-	q_t = \min{ \left \{ \frac{p(W_t \lvert C_t)}{p(W_t)}, 10 \right \} }
+	q_t = \min{ \left \{ \frac{\hat{p}(W_t)}{\hat{p}(W_t \lvert C_t)}, 10 \right \} }
 \]
 to each obsevation.
 Here, we don't know true probability densities,
-so we instead used estimated values.
-One can use normal density as denominator $p(W_t)$,
-but we used relative frequency as the denominator
-since weighting method with relative frequency achieved 
-lower absolute correlation in this application.
+so we should use estimated values.
+
+To estimate $p(W_t \lvert C_t)$, 
+we assumed that 
+the conditional distribution of treatment given covariates is a normal distribution, i.e.
+\[ 
+	W_t\lvert C_t \sim N(m(C_t), \sigma(C_t)^2) 
+\] 
+where $m(C_t)$, and $\sigma(C_t)$ are some functions of $C_t$.
+Since they are unknown in general, we should estimate them. 
+The estimated mean $\hat{m}(C_t)$ was obtained by regressing $W_t$ on $C_t$ with boosting, 
+and the estimated standard deviation $\hat{\sigma}(C)$ was calculated
+by boosting residuals\cite{hirano2004, gpsboosting2015}.
+Hyperparameters such as depth of tree($3$), shrinkage($0.1$), and the number of trees($20$) 
+were determined heuristically to minimize the absolute correlation.
+As an estimate of $p(W_t)$, we used relative frequency as $\hat{p}(W_t)$.
+One may use normal density with sample mean and sample variance too, but
+weighting method with relative frequency achieved lower absolute correlation in this application.
 See the second row and third row of Table 1.
 We trimmed weights bigger than $10$ by $10$,
-because some estimated weights were too large so
+because some untrimmed weights were too large so
 effect estimate was heavily dependent to those observations.
 
-To estimate the numerator $p(W_t \lvert C_t)$, 
-we assumed that the conditional distribution of treatment given covariates is a normal distribution, i.e.
-\[ 
-	W\lvert C \sim N(m(C), \sigma(C)^2) 
-\] 
-where $m(C)$, and $\sigma(C)$ are some functions of $C$.
-Since they are unknown in general, we should estimate them. 
-The mean $\hat{m}(C)$ is estimated by boosting, 
-and the standard deviation $\hat{\sigma}(C)$ is estimated by boosting residuals\cite{hirano2004, gpsboosting2015}.
-Hyperparameters such as depth of tree($3$), shrinkage($0.1$), and the number of trees($20$) 
-are determined heuristically to minimize the absolute correlation.
-
 We calculated absolute correlation (AC)\cite{gpsboosting2015} 
-to see whether the covariate balance is achieved.
+to see whether the covariate balance is achieved (here, AC $<0.1$).
 Let $c_t$ be a component of $C_t$, then absolute correlation with weight $q_t$ is
 the absolute value of Pearson correlation coefficient between $c_t$ and $W_t$,
 regarding each observation as $q_t$ observations with the same values.
+See the table \ref{table:AC}.
 
 \begin{table}[ht]
 	\centering
 \begin{tabular}{|| c || c | c | c | c || }
 	\hline\hline
-	\ & year & month & the week of year & the day of year \\
+	\ & year & month & week of the year & day of the year \\
 	\hline
 	1 & 0.01405874 & 0.25223312 & 0.25127380 & 0.25115386 \\ %0.43699789 before
 	\hline
@@ -276,54 +297,73 @@ regarding each observation as $q_t$ observations with the same values.
 	\hline\hline
 	
 \end{tabular}
-\caption[Table 1.]
-{Absolute correlation (AC) before/after adjustment by IPW.
-The first row is AC before adjustment;
-the second row is AC after adjustment, with relative frequency of temperature as marginal probability;
-the third row is AC after adjustment, with normal assumption on marginal distribution of temperature.}
+\caption{
+	Absolute correlation (AC) before/after adjustment by IPW.
+	The first row is AC before adjustment;
+	the second row is AC after adjustment, 
+	with relative frequency of temperature as marginal probability;
+	the third row is AC after adjustment, 
+	with normal assumption on marginal distribution of temperature.}
+\label{table:AC}
 \end{table}
 
-After covariate balance is acheived (here, AC$<0.1$), 
-we estimated the causal effect by Horvitz-Thompson estimator with stabilized weights,
+The second stage is the analysis stage that relates treatments and outcomes with weights.
+We estimated the causal effect by Horvitz-Thompson estimator with stabilized weights,
 \[
-	\hat{\mu}(w) = \frac{\sum_{t = 1}^T q_t Y_t 1_{(W_t = w)}}{\sum_{t = 1}^T q_t 1_{(W_t = w)}}
+	\hat{\mu}(w) = \frac{\sum_{t = 1}^T q_t Y_t 1_{(W_t = w)}}{\sum_{t = 1}^T q_t 1_{(W_t = w)}}.
 \]
-With $\hat{\mu}(w)$, we calculaated logRR curve by $\log\hat{\mu}(w) - \log \hat{\mu}(20)$.
-Uncertainty of logRR curve is quantified by Moving Block Bootstrapping (MBB)\cite{mbb1989}.
+
+To be consistent with previous studies and standardize different population size across regions,
+we calculated logRR curve by $\log\hat{\mu}(w) - \log \hat{\mu}(20)$ instead of risk difference.
+However, there is no known result about the distribution of estimator of risk ratio.
+So we measured the uncertainty of logRR curve by Moving Block Bootstrapping (MBB)\cite{mbb1989}
+with $2000$ bootstrap samples, $20$ blocks, and each block is length of $400$.
 In the bootstrap procedure, we did not fit gps model repeatedely for each bootstrap sample
 since we need to re-sample the pseudo-population itself that acheives covariate balance.
 
-In fact, asymptotic confidence interval can be calculated 
-if we concentrate on risk difference instead of risk ratio.
-However, there is no known result about asymptotic distribution of risk ratio.
-The reason why we care about the relative risk is
-1) consistency to the previous studies
-2) that the population sizes differ across regions.
-If we consider the risk difference, then additional suitable normalizing step will be required.
+For the purpose of comparison, we fitted the DLNM to our data and pooled the estimates.
+For temperature dimension, 
+we used quadratic B-spline, and placed knots at 10th, 75th, 90th quantiles.
+For lag dimension,
+we considered $21$ lags, used natural B-spline, and placed $3$ knots at equally spaced on log scale.
+For temporal trend adjustment,
+we fitted additional natural B-spline with $8$ degrees of freedom for each year.
 
 \subsection{Pooling estimates}
 
 We assumed $X_i = (Y_{i,t}, W_{i,t}, C_{i,t})_{t = 1}^T$ for $i = 1, \dots, N$ are independent
-and potential outcome of one region is not affected by other regions' potential outcomes and treatments.
+and potential outcome of one region is independent of other regions' potential outcomes and treatments.
 
 For each region $i$, we estimated $\hat{\mu}_i(w)$ in the previous section.
 To obtain aggregated estimate, we assumed
 \[
 	\hat{\mu}_i(w) = \mu(w) + \epsilon_i + \tau,
 \]
-where $\epsilon_i \sim N(0, S_i)$ is within study error and $\tau \sim N(0, V)$ is between study error.
-$S_i$ is estimated by bootstrap,
-so estimation of $V(\tau)$ remains.
-We used R package 'mixmeta' to obtain pooled estimate,
+where $\epsilon_i \sim N(0, s_i)$ is within study error and $\tau \sim N(0, v)$ is between study error.
+$s_i$ is estimated by bootstrap,
+so estimation of $v$ remains.
+We used R package 'mixmeta' to estimate $v$ and obtain pooled estimate,
 which is the weighted average of region specific effect estimate
-where weight is inversely proportional to the variance $S_i + V$ of estimator.
-Precision of pooled estimator is sum of precisions of region specific estimator.
-Confidence interval is obtained by adding (or subtracting) 
-$1.96$ times of pooled standard deviation $\hat{\sigma}$ to pooled logRR curve.
+where weight is inversely proportional to the variance $s_i + v$ of estimator,
+\[
+	\hat{\mu}(w) = \sum_{i = 1}^N \frac{\hat{\mu}_i(w)}{s_i + \hat{v}}.
+\]
+Precision of pooled estimator is sum of precisions of region specific estimator,
+\[
+	\frac{1}{\hat{\sigma}^2} = \sum_{i = 1}^N \frac{1}{s_i + \hat{v}}.
+\]
+Confidence interval is obtained by 
+\[
+	\hat{\mu}(w) \pm 1.96 \hat{\sigma}.
+\]
+
+We pooled the coefficients estimated by the DLNM framework under the same condition,
+except that the response variable is multi-dimensional, 
+and within study error covariance matrices are calculated from the quasi-likelihood method.
 
 \subsection{Result}
 
-In figure 1,
+In figure \ref{figure:main},
 the upper left panel is a logRR curve obtained under the DLNM framework;
 the upper right panel is obtained by applying potential outcome framework;
 the lower left panel is smoothed version of upper right pannel (kernel: Gaussian, bandwidth: $6$);
@@ -352,8 +392,9 @@ in the sense that it becomes similar to the curve of DLNM after kernel smoothing
 
 \begin{figure}
 	\includegraphics[width = \textwidth]{figures/main1.pdf}
-	\caption[Figure 1.]{Estimated overall effect. 
+	\caption{Estimated overall effect. 
 	For extreme hot or cold temperature, estimated effects have quite large uncertainties.}
+	\label{figure:main}
 \end{figure}
 
 \section{Discussion}
@@ -401,14 +442,16 @@ This method has a crucial disadvantage.
 When we have only one observation for treatment $w$, its uncertainty based on MBB is zero.
 It contradicts to our intuition that larger sample size gives lower uncertainty.
 We used MBB method because there is no other useful way to estimate standard error of logRR curve.
-The difficulty comes from the definition of RR.
-It is a ratio between two effect estimate, not the difference.
+The difficulty comes from the definition of RR
+which is a ratio between two effect estimate, not the difference.
+In fact, there is a known result about asymptotic distribution of risk difference estimator.
 Moreover, the estimated standard error of pooled logRR curve is not similar to the one from the DLNM framework.
 This is because,
 the precision of overall effect was obtained by summing up all precisions from each region,
 but some regions did not have observations of extremal temperature.
 This leads us to relatively low precision of overall effect estimates in extreme temperature
 compared to the precision obtained from the DLNM framework.
+
 
 It is well known that the temperature-mortality relationship is heterogeneous across regions. (citation)
 The heterogeneity was usually explained by meta-regression
