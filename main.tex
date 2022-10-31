@@ -18,20 +18,24 @@
 %korean
 \usepackage{kotex}
 
+%comment
+\usepackage{comment}
+
 
 \newtheorem{thm}{Theorem}
 \newtheorem{asm}{Assumption}
 
 \author[1]{Jaemin Oh}
 \author[2]{Yeonseung Chung}
-\affil[1,2]{Department of Mathematical Sciences, KAIST}
+\affil[1,2]{Department of Mathematical Sciences, 
+KAIST, Daejeon, South Korea}
 
 %1.5 line space
 \linespread{1.5} 
 
 \title{
 	Causal inference on temperature-mortality relationship using time-series data: 
-	comparing the potential outcome framework and regression analysis
+	comparing the distributed lag nonlinear model and Rubin causal model
 	} %
 
 \begin{document}
@@ -44,8 +48,8 @@
 	under the DLNM framework.
 	There has been many concerns about causal interpretation on the temperature-mortality relationship,
 	because of unmeasured confounders, model misspecification, 
-	and mixing of the design and the analysis stages.
-	In this paper, we used the potential outcome framework to deal with latter two issues,
+	and mixing of the design stage and the analysis stage.
+	In this paper, we used the potential outcome framework to deal with the last two issues,
 	and obtained the consistent result compared to the previous studies.
 	This work shines a light on the possibility of causal interpretation on
 	temperature-mortality relationship analyzed so far.
@@ -55,62 +59,119 @@
 
 Due to global warming and climate change,
 analyzing the effect of the ambient temperature on human health is an important research topic
-\cite{gasparrini2017, yoonhee2019}(Gasparrini lancet, 김윤희 교수님 EHP. need more?).
-Usually, the relationship has been analyzed by using regional time series data.
-There are difficulties in analyzing the relationship with time series data, such as 
-temporal trend of outcomes, and the existence of delayed effect.
+\cite{gasparrini2017, yoonhee2019}.
+Usually, the relationship has been analyzed by using regional time series data
+inspite of obstacles such as 
+temporal trend of death counts and temperature, and the existence of delayed effect.
 These difficulties have been addressed by 
-the distributed lag nonlinear effect model (DLNM) framework\cite{dlnm2010}
-which used the quasi-Poisson regression\cite{quasipoisson} to estimate coefficients.
-It produces exposure-response surface
+the distributed lag nonlinear model (DLNM) framework\cite{dlnm2010}
+producing exposure-response surface
 $\mu : (w, l) \mapsto \mu(w,l) \in \mathbb{R}$ where $w$ is the ambient temperature and $l$ is a time lag.
-Such regression analyses have some advantages:
-lagged effect can be easily identified;
-it summarizes the information of the curve representing relative risk (RR) by spline coefficients,
-so meta-analysis is possible with considering the covariance of effects at different temperatures.
+In general, regression methods containing the DLNM framework have some advantages:
+identification of lagged effects and
+low dimensional summary of estimated nonlinear exposure-response curve.
 These advantages make regression approach popular in environmental epidemiology,
 especially for the topic of temperature-mortality relationship.
 
 However, there has been a concern about causal interpretation 
 on the results obtained by regression analysis.
-Obviously, the primary issue is the existence of unmeasured confounders
-that cannot be solved without collecting additional data.
-Additionally, in recent debate on air pollution study\cite{dominici2019sci},
-two aspects of regression analysis were pointed out:
-mixing of design stage and analysis stage 
-that uses outcomes in confounding bias adjustment\cite{rubin2007sim}
-and model misspecification problem.
-In fact, these problems remain the same in the context of the temperature mortality relationship;
-the DLNM framework mixes design stage and analysis stage,
-since it fits additional spline for each year to adjust for temporal confounding;
-it is susceptible to model misspecification\cite{gasparrini2016}
+In recent debate on air pollution study\cite{dominici2019sci} 
+that uses similar tools to analyze time-series data,
+two aspects were pointed out:
+mixing of design stage \& analysis stage, and model selection problem.
+Rubin said, in observational study,
+design stage that adjusts confounding bias and analyis stage that relates treatments and outcomes
+should be separated to approximate the gold standard of causal inference, 
+the randomized experiment\cite{rubin2007sim}.
+However, regression methods, e.g., the DLNM framework mixes two stages
+by fitting additional spline for each year to adjust for temporal confounding.
+Moreover, the DLNM framework is susceptible to model selection problem\cite{gasparrini2016}
 since we don't know the exact placement of knots and the exact degrees of freedom.
-Therefore, these two problems should be solved first to make causal interpretation possible.
+Therefore, we have to solve these issues first to make causal interpretation possible,
+together with collecting more data to remove the existence of unmeasured confounders.
 
 As a solution, we suggests to use Rubin causal model (RCM)\cite{holland1986}
 known as the potential outcome framework.
 It separates the design stage and the analysis stage,
-and does not need any parametric model to outcome generating process,
-so it is more free to model misspecification.
-The potential outcome framework was first introduced 
+and does not need to select any parametric model for outcome generating process.
+RCM was first introduced 
 to analyze the data of randomized experiments\cite{rubin1974},
 but now widely used in observational studies\cite{wu2020sciadv},
 and even in time series data\cite{angrist2018}.
-In this paper, we used potential outcome framework to estimate logRR curve of the ambient temperature 
+In this paper, 
+we used RCM to estimate the log of relative risk (logRR) curve of the ambient temperature 
 and compared the result to the DLNM framework.
 
+\begin{comment}
 The paper proceeds as follows: 
-in Section 2, we describe settings and assumptions of the potential outcome framework.
-In Section 3, we apply the method suggested in section 2 and regression method 
+in Section \ref{section:method}, we describe settings and assumptions of the potential outcome framework.
+In Section \ref{section:application}, 
+we apply the method suggested in section \ref{section:method} and regression method 
 to regional time-series data and compare the results.
-Finally, we discuss pros and cons of 
-the application of the potential outcome framework to analyze the temperature-mortality relationship.
+Finally, we discuss pros and cons of the application of the potential outcome framework 
+to analyze the temperature-mortality relationship in section \ref{section:discussion}.
+\end{comment}
 
-\section{Method}
 
-The state of a region at time $t$ can be described by $(Y_t, W_t, C_t)$ 
-where $Y_t$ is a vector of observed outcome, $W_t$ is daily mean temperature, 
-and $C_t$ is a vector of confounders.
+\section{Dataset}
+\label{section:data}
+
+The data is composed of daily mean temperature in the first decimal place, and
+all-cause mortality count during the period from 1997 to 2018 across 36 regions in South Korea.
+Figure \ref{figure:temporal-trend}
+presents daily mean temperature and daily all-cause deaths in Seoul between 2010 and 2018.
+The daily mean temperature shows apparent seasonality and 
+the peaks are increasing due to global warming.
+The number of deaths shows annual seasonality 
+with an increase in cold seasons and a decrease in warm seasons.
+It shows long-term increasing trend also.
+
+\begin{figure}
+	\includegraphics[width = \textwidth]{figures/temporal-trend.pdf}
+	\caption{
+		Daily times series of 
+		mean temperature (in Celcius) and all-cause death in Seoul from 2010 to 2018}
+	\label{figure:temporal-trend}
+\end{figure}
+
+
+\section{Method} 
+\label{section:method}
+
+For $i = 1, \dots, N(=36)$ and $t = 1, \dots, T(=8054)$, 
+the state of $i$-th region at time $t$ can be described by $(Y_{i,t}, W_{i,t}, C_{i,t})$ 
+where $Y$ is the all-cause death counts, $W$ is the mean temperature, 
+and $C$ is the vector of the year, the month of year, the week of year, and the day of year.
+Hereafter, we consider a fixed region and drop the subscript $i$ to simplify the notation.
+
+\subsection{Distributed Lag Nonlinear Model}
+\label{section:dlnm}
+
+In the DLNM framework,
+the temperature-mortality association is described by the equations
+\[
+	\begin{split}
+		Y_t &\sim quasi-Possion(\lambda_t), \\
+		\log(\lambda_t) &= \alpha + cb(W_t, \dots, W_{t-L};\beta) + \eta(C_t; \gamma).
+	\end{split}
+\]
+where $\lambda_t$ is the mean of 
+the Poisson distribution with overdispersion (namely, Quasi-Possion\cite{quasipoisson}),
+$cb$ is the cross basis function with specified lag $L$,
+and $\eta$ is spline basis.
+By maximizing quasi-likelihood function, 
+we get estimates $\hat{\alpha}, \hat{\beta}$ and $\hat{\gamma}$.
+Here, we emphasize that 
+including $\eta$ in the model is equivalent to eliminating temporal trend in all-cause deaths,
+and fitting $cb$ function is estimating temperature effect,
+thus the design stage \& the analysis stage are mixed.
+
+
+
+
+
+\subsection{Rubin Causal Model}
+\label{section:rcm}
 
 Now we introduce the notation of potential outcomes.
 $Y_t(w)$ refers to the outcome variable at time $t$
@@ -217,34 +278,36 @@ If treatment and covariates are independent, then their correlation must be zero
 So, small value of AC can be an evidence of covariate balance.
 Usually, AC with $ <0.1 $ is considered as acceptible.
 
+
 \section{Application}
+\label{section:application}
 
-%plottings
-The data is composed of daily mean temperature in the first decimal place, and
-all-cause mortality count during the period from 1997 to 2018 across 36 regions in South Korea.
-In figure \ref{figure:temporal-trend},
-we can observe that there is an increasing trend in 
-both yearly maximum of daily mean temperature and yearly total death count.
-\begin{figure}
-	\includegraphics[width = \textwidth]{figures/temporal-trend.pdf}
-	\caption{Temporal trend of yearly maximum of daily mean temperature and total death count.}
-	\label{figure:temporal-trend}
-\end{figure}
+We set the reference temperature by $20^\circ$C.
+\subsection{Distributed Lag Nonlinear Model}
 
+We fitted the DLNM to our data to obtain region specific effect estimates.
+For temperature dimension, 
+we used quadratic B-spline, and placed knots at 10th, 75th, 90th quantiles.
+For lag dimension,
+we considered $21$ lags, used natural B-spline, and placed $3$ knots at equally spaced on log scale.
+For temporal trend adjustment,
+we fitted additional natural B-spline with $8$ degrees of freedom for each year.
 
+With multiple effect estimates from various reigions,
+we pooled those estimates by multivariate meta-analysis.
+We modeled effect estimates $\hat{\beta}_i$ from $i$-th region as a mixed-effect model
+\[
+	\hat{\beta}_i \sim N_m(\beta, S_i + V)
+\]
+where $N_m$ denotes $m$-dimensional multivariate normal distribution,
+$S_i$ and $V$ are with-in and between study error covariances, respectively,
+and $\beta$ is the true aggregated effect.
+We used R package 'mixmeta' to estimate $\beta$ and its confidence interval.
+See the upper left panel of figure \ref{figure:main}.
 
+\subsection{Rubin Causal Model}
 
-For $i = 1, \dots, N(=36)$ and $t = 1, \dots, T(=8054)$, 
-let $(Y_{i,t}, W_{i,t}, C_{i,t})$ be information of $i$-th region at time $t$.
-$Y$ is daily total death count, $W$ is daily mean temperature 
-and $C$ is a vector of year, month of the year, week of the year, and day of the year.
 We rounded daily mean temperature to integer value.
-
-\subsection{Single series estimate}
-
-In this subsection in which we concentrate on single time series, 
-we will drop $i$ to simpify the notation.
-
 The first stage is design stage to adjust for time confounding.
 We adjusted confounding bias by stabilized inverse probability weighting\cite{sipw2010}
 that assign weights
@@ -308,7 +371,7 @@ See the table \ref{table:AC}.
 \end{table}
 
 The second stage is the analysis stage that relates treatments and outcomes with weights.
-We estimated the causal effect by Horvitz-Thompson estimator with stabilized weights,
+We estimated the causal effect by Horvitz-Thompson estimator with trimmed stabilized weights,
 \[
 	\hat{\mu}(w) = \frac{\sum_{t = 1}^T q_t Y_t 1_{(W_t = w)}}{\sum_{t = 1}^T q_t 1_{(W_t = w)}}.
 \]
@@ -321,20 +384,11 @@ with $2000$ bootstrap samples, $20$ blocks, and each block is length of $400$.
 In the bootstrap procedure, we did not fit gps model repeatedely for each bootstrap sample
 since we need to re-sample the pseudo-population itself that acheives covariate balance.
 
-For the purpose of comparison, we fitted the DLNM to our data and pooled the estimates.
-For temperature dimension, 
-we used quadratic B-spline, and placed knots at 10th, 75th, 90th quantiles.
-For lag dimension,
-we considered $21$ lags, used natural B-spline, and placed $3$ knots at equally spaced on log scale.
-For temporal trend adjustment,
-we fitted additional natural B-spline with $8$ degrees of freedom for each year.
+To pool the estimates,
+we assumed $X_i = (Y_{i,t}, W_{i,t}, C_{i,t})_{t = 1}^T$ for $i = 1, \dots, N$ are independent
+and potential outcomes of one region is independent of other regions' potential outcomes and treatments.
 
-\subsection{Pooling estimates}
-
-We assumed $X_i = (Y_{i,t}, W_{i,t}, C_{i,t})_{t = 1}^T$ for $i = 1, \dots, N$ are independent
-and potential outcome of one region is independent of other regions' potential outcomes and treatments.
-
-For each region $i$, we estimated $\hat{\mu}_i(w)$ in the previous section.
+We estimated $\hat{\mu}_i(w)$ for each region $i$ previously.
 To obtain aggregated estimate, we assumed
 \[
 	\hat{\mu}_i(w) = \mu(w) + \epsilon_i + \tau,
@@ -342,11 +396,12 @@ To obtain aggregated estimate, we assumed
 where $\epsilon_i \sim N(0, s_i)$ is within study error and $\tau \sim N(0, v)$ is between study error.
 $s_i$ is estimated by bootstrap,
 so estimation of $v$ remains.
-We used R package 'mixmeta' to estimate $v$ and obtain pooled estimate,
-which is the weighted average of region specific effect estimate
+We estimated $v$ and pooled estimates
+by taking weighted average of region specific effect estimates
 where weight is inversely proportional to the variance $s_i + v$ of estimator,
 \[
-	\hat{\mu}(w) = \sum_{i = 1}^N \frac{\hat{\mu}_i(w)}{s_i + \hat{v}}.
+	\hat{\mu}(w) = \sum_{i = 1}^N \frac{\hat{\mu}_i(w)}{s_i + \hat{v}}
+	/\sum_{i = 1}^N \frac{1}{s_i + \hat{v}}.
 \]
 Precision of pooled estimator is sum of precisions of region specific estimator,
 \[
@@ -356,10 +411,8 @@ Confidence interval is obtained by
 \[
 	\hat{\mu}(w) \pm 1.96 \hat{\sigma}.
 \]
+See the upper right panel of figure \ref{figure:main}.
 
-We pooled the coefficients estimated by the DLNM framework under the same condition,
-except that the response variable is multi-dimensional, 
-and within study error covariance matrices are calculated from the quasi-likelihood method.
 
 \subsection{Result}
 
@@ -398,6 +451,7 @@ in the sense that it becomes similar to the curve of DLNM after kernel smoothing
 \end{figure}
 
 \section{Discussion}
+\label{section:discussion}
 
 In the extent of my knowledge, there has been no study analyzing the short term relationship 
 between the ambient temperature and the all-cause mortality using the potential outcome framework.
@@ -406,8 +460,6 @@ was investigated under the potential outcome framework.
 Consistency between new approach and existing regression method reinforced
 usefulness of regression method, and added an evidence of causal relationship found by previous studies.
 However, there are some unsolved limitations.
-
-\subsection{Limitations}
 
 In the potential outcome framework, we could not do several analyses that the DLNM framework can do:
 identification of the lagged effect, distribution based confidence interval, and meta-regression.
