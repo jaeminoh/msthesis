@@ -41,7 +41,6 @@ KAIST, Daejeon, South Korea}
 \begin{document}
 
 \maketitle
-\tableofcontents
 
 \abstract{
 	Temperature-mortality relationship has been analyzed by using regional time series data
@@ -49,11 +48,12 @@ KAIST, Daejeon, South Korea}
 	There has been many concerns about causal interpretation on the temperature-mortality relationship,
 	because of unmeasured confounders, model misspecification, 
 	and mixing of the design stage and the analysis stage.
-	In this paper, we used the potential outcome framework to deal with the last two issues,
+	In this paper, we used Rubin causal model (RCM) to deal with the last two issues,
 	and obtained the consistent result compared to the previous studies.
 	This work shines a light on the possibility of causal interpretation on
 	temperature-mortality relationship analyzed so far.
 }
+
 
 \section{Introduction}
 
@@ -210,7 +210,7 @@ the fundamental assumptions that make it possible to estimate the causal estiman
 	That is, $Y_t(W_t) = Y_t$.
 \end{asm}
 
-\begin{asm}[Positivity]\hfill
+\begin{asm}[Positivity]\label{asm:positivity}\hfill
 
 	Discrete treatment:
 	For all $w$ and $C_t$, $p(w\lvert C_t) = Pr\left ( W_t = w \lvert C_t\right ) \in (0, 1)$.
@@ -220,7 +220,7 @@ the fundamental assumptions that make it possible to estimate the causal estiman
 \end{asm}
 
 
-\begin{asm}[Weak Unconfoundedness] \hfill
+\begin{asm}[Weak Unconfoundedness]\label{asm:unconfoundedness} \hfill
 
 	For all $w$, $Y_{t}(w) \perp W_t \lvert C_t$.
 \end{asm}
@@ -396,7 +396,7 @@ To obtain aggregated estimate, we assumed
 where $\epsilon_i \sim N(0, s_i)$ is within study error and $\tau \sim N(0, v)$ is between study error.
 $s_i$ is estimated by bootstrap,
 so estimation of $v$ remains.
-We estimated $v$ and pooled estimates
+We estimated $v$, and aggregated estimates from 36 regions
 by taking weighted average of region specific effect estimates
 where weight is inversely proportional to the variance $s_i + v$ of estimator,
 \[
@@ -418,7 +418,7 @@ See the upper right panel of figure \ref{figure:main}.
 
 In figure \ref{figure:main},
 the upper left panel is a logRR curve obtained under the DLNM framework;
-the upper right panel is obtained by applying potential outcome framework;
+the upper right panel is obtained by applying RCM;
 the lower left panel is smoothed version of upper right pannel (kernel: Gaussian, bandwidth: $6$);
 the lower right pannel is a logRR curve without adjusting temporal trend under the DLNM framework.
 
@@ -438,9 +438,9 @@ In the lower left pannel, we applied kernel smoothing to our estimate to remove 
 The smoothed curve and the curve of the upper left panel have similar values 
 compared to the curve of the lower right panel.
 From this point of view, 
-we may say potential outcome framework can adjust temporal confounding bias in some extent.
+we may say RCM can adjust temporal confounding bias in some extent.
 Moreover, we don't know what is the true logRR curve,
-but we may insist that the logRR curve obtained from potential outcome framework is more general
+but we may insist that the logRR curve obtained from RCM is more general
 in the sense that it becomes similar to the curve of DLNM after kernel smoothing.
 
 \begin{figure}
@@ -450,65 +450,56 @@ in the sense that it becomes similar to the curve of DLNM after kernel smoothing
 	\label{figure:main}
 \end{figure}
 
+
 \section{Discussion}
 \label{section:discussion}
 
 In the extent of my knowledge, there has been no study analyzing the short term relationship 
-between the ambient temperature and the all-cause mortality using the potential outcome framework.
-In this work, the causal link between the ambient temperature and mortality 
-was investigated under the potential outcome framework.
+between the ambient temperature and the all-cause mortality using RCM.
+In this article, the causal link between the ambient temperature and mortality 
+was investigated under RCM.
 Consistency between new approach and existing regression method reinforced
 usefulness of regression method, and added an evidence of causal relationship found by previous studies.
 However, there are some unsolved limitations.
 
-In the potential outcome framework, we could not do several analyses that the DLNM framework can do:
-identification of the lagged effect, distribution based confidence interval, and meta-regression.
-
-The DLNM framework is able to produce 
-exposure-response surface with treatment dimension and lag dimension.
-Therefore, the lagged effect of any treatment level can be identified after obtaining the surface.
-In contrast, we estimated the effect of the treatment by only using the current outcome variable.
-This can produce exposure-response curve, not the surface 
-since we did not use any information about lagged treatment or lagged outcome.
-Thus our approach does not have ability to measure the lagged effect of the treatment.
-Actually, there is a method to measure the lagged effect in a single time series setting\cite{bojinov2019}.
-However, this paper is limited to binary (sequential) treatment setting,
-so the curse of dimension makes it hard to be directly applicable to continuous treatment case.
+In RCM, we could not do several analyses that the DLNM framework can do:
+identification of the lagged effect, 
+distribution based confidence interval, and multivariate meta-analysis.
+The exposure-response surface that the DLNM framework produces 
+makes us possible to identify lagged effect of the ambient temperature.
+In contrast, RCM does not have ability to measure the lagged effect of the ambient temperature,
+since it does not use any information about lagged temperature.
+Actually, there is a method to measure the lagged effect\cite{bojinov2019}.
+However, that method is limited to binary (sequential) treatment,
+so the curse of dimension inhibits direct application of that method to our case.
 %(With maximum lag $L$, the number of combinations of possible treatment path is $2^{L+1}$ for binary case but there are more than $50$ categories of daily mean temperature so the number of treatment path exceeds $50^{L+1}$. Even if $L = 2$, the number of possible combinations of treatment assignment for 3 days exceeds the length of series $8000$. Note that we used $L = 21$ for the DLNM framework.)
+\begin{comment}
+	%Controversial: 
 Someone may say to us that the calculated logRR curve does not represent overall effect 
 but represents instant effect since we did not account for lagged effect.
 However, under the assumption that 
 treatment history would have been almost the same during short period, due to their high autocorrelation,
 our effect estimate represents overall effect.
-
-
+\end{comment}
 The DLNM framework provides the confidence interval based on asymptotic normality 
 followed by maximizing quasi-likelihood function.
-However, in our case, we quantified the uncertainty of estimated logRR curve by moving block bootstrap
-to include information about temporal correlation.
-This method has a crucial disadvantage.
-Consider the situation that we have only one observation for some treatment level $w$.
-Then its uncertainty based on MBB must be zero.
-It contradicts to our intuition that larger sample size gives lower uncertainty.
-Although, there was no alternative way to obtain standard error of logRR curve.
-The difficulty of getting the exact or asymptotic distribution of our estimator
-comes from the definition of RR, which is the ratio between two effects, not the difference.
+Unfortunately, there is no exact or asymptotic distribution of our estimator in our case,
+due to the difficulty derived from the definition of RR, 
+which is the ratio between two effects, not the difference.
+So we quantified the uncertainty of estimated logRR curve by moving block bootstrap.
 Moreover, the standard error of pooled logRR curve seems not similar to the one from the DLNM framework.
 This is because,
 the precision of overall effect was obtained by summing up all precisions from each region,
 but some regions did not have observations of extremal temperature.
 This leads us to relatively low precision of overall effect estimates in extreme temperature.
-
-It is well known that the temperature-mortality relationship is heterogeneous across regions(citation).
-The heterogeneity has been explained by meta-regression
+The heterogeneity of temperature effect has been explained by multivariate meta-analysis
 that has spline coefficients obtained from the DLNM framework as the response variable, 
 and regional level variables such as latitude or climate zone as meta-predictors.
-Loosely speaking, the meta-regression with coefficients
+Loosely speaking, multivariate meta-analysis with coefficients that summarize the estimated RR curve
 is analyzing the heterogeneity of curve itself across regions.
-However, in our suggestion, we just pooled the effect estimates from each region 
-by naively taking weighted average for each treatment value.
-It did not use the information near a given treatment value,
-since the covariance of estimated effects was unavailable.
+However, in our suggestion, we just pooled the effect estimates from each region pointwisely.
+In fact, multivariate meta-analysis is possible by considering bootstrap covariance,
+but it is computationally too expensive.
 
 In addition to the weekness compared to the regression method stated above,
 our method has several disadvantages of itself to be addressed:
@@ -530,6 +521,8 @@ there are so many factors that may have influence on daily mean temperature,
 we gave normal assumption on the distribution of daily mean temperature 
 based on the central limit theorem.
 
+\begin{comment}
+	% variance-bias tradeoff, might be inappropriate
 We estimated logRR curve without any modeling assumption after confounding adjustment.
 Also, the estimator does not borrow information near given treatment value.
 This makes the estimate soley rely on observed values.
@@ -541,29 +534,28 @@ but they assumed parametric model to the outcome generating process
 so effect estimates at extreme temperature is a result of borrowing information near the temperature point,
 and it makes extreme cases play somewhat shrinked role compared to our approach,
 which means lower variance and higher bias.
+\end{comment}
 
-There is a possibility of violation on two key assumptions in the potential outcome framework.
-The first one is unconfoundedness
-that potential outcome and treatment are independent given measured confounders.
-This assumption may be violated when there is an unmeasured confounder,
-since unmeasured confounder can change the distribution of potential outcome.
-In our case, we cannot measure everything related to temperature-mortality relationship
-so it is plausible to think unconfoundedness assumption is violated.
-The second one is positivity (overlap) assumption
+There is a possibility of violation on 
+two key assumptions \ref{asm:positivity},\ref{asm:unconfoundedness} in RCM.
+The first one is positivity assumption
 that any treatment has positive probability of being assigned for each confounder.
 In our case, the confounder is time and 
-there is always some chance of extreme temperature because of catastrophic events in theory.
+there is always nonzero probability of extreme temperature because of catastrophic events.
 However those events rarely happen in reality, 
-so stochastic positivity violation\cite{zivich2022} can happen.
-The reason is we don't have enough sample size.
-To address this issue, we made normal assumption on gps,
+so stochastic positivity violation\cite{zivich2022} due to small sample size can happen.
+To fix the issue, we made normal assumption on gps,
 and trimmed very small probability to $0.1$ to ensure stability.
+The second one is unconfoundedness
+that may be violated when there is an unmeasured confounder.
+In our case, we cannot measure everything related to temperature-mortality relationship
+so it is plausible to think unconfoundedness assumption is violated.
+To overcome this issue, we should carefully think about confounding structure
+and collect more data of potential confounders.
 
 
 \bibliography{reference}{}
 \bibliographystyle{plain}
-
-
 
 
 \end{document}
