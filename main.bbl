@@ -25,22 +25,16 @@ Antonio Gasparrini.
   Simulation Study}.
 \newblock {\em Epidemiology}, 27(6), 2016.
 
-\bibitem{gasparrini2017}
-Antonio Gasparrini, Yuming Guo, Francesco Sera, Ana~Maria Vicedo-Cabrera,
-  Veronika Huber, Shilu Tong, Micheline {de Sousa Zanotti Stagliorio Coelho},
-  Paulo~Hilario {Nascimento Saldiva}, Eric Lavigne, Patricia {Matus Correa},
-  Nicolas {Valdes Ortega}, Haidong Kan, Samuel Osorio, Jan Kyselý, Aleš
-  Urban, Jouni J~K Jaakkola, Niilo R~I Ryti, Mathilde Pascal, Patrick~G
-  Goodman, Ariana Zeka, Paola Michelozzi, Matteo Scortichini, Masahiro
-  Hashizume, Yasushi Honda, Magali Hurtado-Diaz, Julio {Cesar Cruz}, Xerxes
-  Seposo, Ho~Kim, Aurelio Tobias, Carmen Iñiguez, Bertil Forsberg,
-  Daniel~Oudin Åström, Martina~S Ragettli, Yue~Leon Guo, Chang fu~Wu,
-  Antonella Zanobetti, Joel Schwartz, Michelle~L Bell, Tran~Ngoc Dang, Dung~Do
-  Van, Clare Heaviside, Sotiris Vardoulakis, Shakoor Hajat, Andy Haines, and
-  Ben Armstrong.
-\newblock Projections of temperature-related excess mortality under climate
-  change scenarios.
-\newblock {\em The Lancet Planetary Health}, 1(9):e360--e367, 2017.
+\bibitem{gasparrini2015}
+Antonio Gasparrini, Yuming Guo, Masahiro Hashizume, Eric Lavigne, Antonella
+  Zanobetti, Joel Schwartz, Aurelio Tobias, Shilu Tong, Joacim Rockl{\"o}v,
+  Bertil Forsberg, Michela Leone, Manuela De~Sario, Michelle~L Bell,
+  Yue-Liang~Leon Guo, Chang-Fu Wu, Haidong Kan, Seung-Muk Yi, Micheline
+  de~Sousa Zanotti Stagliorio~Coelho, Paulo Hilario~Nascimento Saldiva, Yasushi
+  Honda, Ho~Kim, and Ben Armstrong.
+\newblock Mortality risk attributable to high and low ambient temperature: a
+  multicountry observational study.
+\newblock {\em Lancet}, 386(9991):369--375, July 2015.
 
 \bibitem{dominici2019sci}
 Gretchen~T. Goldman and Francesca Dominici.
@@ -122,6 +116,13 @@ Stanley Xu, Colleen Ross, Marsha~A. Raebel, Susan Shetterly, Christopher
 \newblock Use of stabilized inverse propensity scores as weights to directly
   estimate relative risk and its confidence intervals.
 \newblock {\em Value in Health}, 13(2):273--277, 2010.
+
+\bibitem{temperaturemorbidity}
+Xiaofang Ye, Rodney Wolff, Weiwei Yu, Pavla Vaneckova, Xiaochuan Pan, and Shilu
+  Tong.
+\newblock Ambient temperature and morbidity: A review of epidemiological
+  evidence.
+\newblock {\em Environmental Health Perspectives}, 120(1):19--28, 2012.
 
 \bibitem{gpsboosting2015}
 Ghosh~D. Zhu~Y, Coffman~DL.

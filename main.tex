@@ -34,7 +34,7 @@ KAIST, Daejeon, South Korea}
 \linespread{1.5} 
 
 \title{
-	Causal inference on temperature-mortality relationship using time-series data: 
+	Causal inference on temperature-mortality relationship: 
 	comparing the distributed lag nonlinear model and Rubin causal model
 	} %
 
@@ -46,9 +46,9 @@ KAIST, Daejeon, South Korea}
 	Temperature-mortality relationship has been analyzed by using regional time series data
 	under the DLNM framework.
 	There has been many concerns about causal interpretation on the temperature-mortality relationship,
-	because of unmeasured confounders, model misspecification, 
-	and mixing of the design stage and the analysis stage.
-	In this paper, we used Rubin causal model (RCM) to deal with the last two issues,
+	because of unmeasured confounders, model selection problem, 
+	and mixing of the design stage \& the analysis stage.
+	In this article, we used Rubin causal model (RCM) to deal with the last two issues,
 	and obtained the consistent result compared to the previous studies.
 	This work shines a light on the possibility of causal interpretation on
 	temperature-mortality relationship analyzed so far.
@@ -59,17 +59,16 @@ KAIST, Daejeon, South Korea}
 
 Due to global warming and climate change,
 analyzing the effect of the ambient temperature on human health is an important research topic
-\cite{gasparrini2017, yoonhee2019}.
-Usually, the relationship has been analyzed by using regional time series data
-inspite of obstacles such as 
-temporal trend of death counts and temperature, and the existence of delayed effect.
+\cite{gasparrini2015, yoonhee2019, temperaturemorbidity}.
+Usually, the analysis of the relationship has conducted on regional time series setting,
+and it was challenging because of temporal trend in time series and the existence of delayed effect.
 These difficulties have been addressed by 
 the distributed lag nonlinear model (DLNM) framework\cite{dlnm2010}
-producing exposure-response surface
+producing nonlinear exposure-response surface
 $\mu : (w, l) \mapsto \mu(w,l) \in \mathbb{R}$ where $w$ is the ambient temperature and $l$ is a time lag.
 In general, regression methods containing the DLNM framework have some advantages:
 identification of lagged effects and
-low dimensional summary of estimated nonlinear exposure-response curve.
+low dimensional summary of estimated nonlinear exposure-response curve derived from the surface.
 These advantages make regression approach popular in environmental epidemiology,
 especially for the topic of temperature-mortality relationship.
 
@@ -139,7 +138,7 @@ It shows long-term increasing trend also.
 \label{section:method}
 
 For $i = 1, \dots, N(=36)$ and $t = 1, \dots, T(=8054)$, 
-the state of $i$-th region at time $t$ can be described by $(Y_{i,t}, W_{i,t}, C_{i,t})$ 
+the information of $i$-th region at time $t$ can be described by $(Y_{i,t}, W_{i,t}, C_{i,t})$ 
 where $Y$ is the all-cause death counts, $W$ is the mean temperature, 
 and $C$ is the vector of the year, the month of year, the week of year, and the day of year.
 Hereafter, we consider a fixed region and drop the subscript $i$ to simplify the notation.
@@ -162,12 +161,10 @@ and $\eta$ is spline basis.
 By maximizing quasi-likelihood function, 
 we get estimates $\hat{\alpha}, \hat{\beta}$ and $\hat{\gamma}$.
 Here, we emphasize that 
-including $\eta$ in the model is equivalent to eliminating temporal trend in all-cause deaths,
+including $\eta$ in the model is equivalent to eliminating temporal trend in all-cause deaths
+to see the short term variation,
 and fitting $cb$ function is estimating temperature effect,
 thus the design stage \& the analysis stage are mixed.
-
-
-
 
 
 \subsection{Rubin Causal Model}
@@ -236,18 +233,20 @@ Under these three assumptions, the causal estimand can be calculated as
 		\mathbb{E}\left[ Y_t\frac{1_{(W_t = w)}}{p(w\lvert C_t)} \right]
 		& = \mathbb{E}\left[ \mathbb{E}\left( Y_t(w) \frac{1_{(W_t = w)}}{p(w\lvert C_t)} \lvert C_t\right)\right]\\
 		& = \mathbb{E}\left[ Y_t(w)\frac{\mathbb{E}\left( 1_{(W_t = w)}\lvert C_t \right)}{p(w\lvert C_t)} \right]\\
-		& = E\left[ Y_t(w) \right] = \mu(w),
+		& = \mathbb{E}\left[ Y_t(w) \right] = \mu(w),
 	\end{split}
 \]
 where $p$ is a mass or density function for discrete or continuous treatment respectively.
-Note that the first equality comes from the interated expectation formula and consistency assumption,
-the second equality comes from weak unconfoundedness assumption,
+The first equality comes from the interated expectation formula and assumption \ref{asm:consistency},
+the second equality comes from assumption \ref{asm:unconfoundedness},
 and the third equality is due to the definition of $p(w\lvert C_t)$.
-By positivity assumption, we can divide by $p(w\lvert C_t)$.
-This is called "inverse probability weighting" (IPW).
-Thus, a natural estimator of the causal estimand is
+Thanks to the assumption \ref{asm:positivity}, we can divide by $p(w\lvert C_t)$.
+This is called "inverse probability weighting" (IPW)
+which is used to approximate randomized experiment from conditionally randomized experiment.
+Therefore, a natural estimator of the causal estimand is
 \[
 	\hat{\mu}(w) = \frac{1}{T}\sum_{t = 1}^T Y_t \frac{1_{(W_t = w)}}{p(w\lvert C_t)}.	
+	(Consistency???)
 \]
 
 Still, we need to estimate $p(w\lvert C_t)$ since it is unknown to us in general.
@@ -286,12 +285,15 @@ We set the reference temperature by $20^\circ$C.
 \subsection{Distributed Lag Nonlinear Model}
 
 We fitted the DLNM to our data to obtain region specific effect estimates.
-For temperature dimension, 
-we used quadratic B-spline, and placed knots at 10th, 75th, 90th quantiles.
-For lag dimension,
-we considered $21$ lags, used natural B-spline, and placed $3$ knots at equally spaced on log scale.
-For temporal trend adjustment,
-we fitted additional natural B-spline with $8$ degrees of freedom for each year.
+Based on the previous study\cite{gasparrini2015},
+we used quadratic B-spline, and placed knots at 10th, 75th, 90th quantiles
+for temperature dimension,
+we considered $21$ lags, used natural B-spline, 
+and placed $3$ knots at equally spaced values in the log scale for lag dimension
+for lag dimension,
+we fitted additional natural B-spline with $8$ degrees of freedom for each year
+to eliminate seasonality,
+and indicator variables of the day of week was included to control its effect.
 
 With multiple effect estimates from various reigions,
 we pooled those estimates by multivariate meta-analysis.
@@ -325,6 +327,8 @@ the conditional distribution of treatment given covariates is a normal distribut
 	W_t\lvert C_t \sim N(m(C_t), \sigma(C_t)^2) 
 \] 
 where $m(C_t)$, and $\sigma(C_t)$ are some functions of $C_t$.
+Obviously, there might be more predictors than the date,
+but we considered their influence as a Gaussian error term based on the central limit theorem.
 Since they are unknown in general, we should estimate them. 
 The estimated mean $\hat{m}(C_t)$ was obtained by regressing $W_t$ on $C_t$ with boosting, 
 and the estimated standard deviation $\hat{\sigma}(C)$ was calculated
@@ -416,6 +420,13 @@ See the upper right panel of figure \ref{figure:main}.
 
 \subsection{Result}
 
+\begin{figure}
+	\includegraphics[width = \textwidth]{figures/main1.pdf}
+	\caption{Estimated overall effect. 
+	For extreme hot or cold temperature, estimated effects have quite large uncertainties.}
+	\label{figure:main}
+\end{figure}
+
 In figure \ref{figure:main},
 the upper left panel is a logRR curve obtained under the DLNM framework;
 the upper right panel is obtained by applying RCM;
@@ -443,24 +454,21 @@ Moreover, we don't know what is the true logRR curve,
 but we may insist that the logRR curve obtained from RCM is more general
 in the sense that it becomes similar to the curve of DLNM after kernel smoothing.
 
-\begin{figure}
-	\includegraphics[width = \textwidth]{figures/main1.pdf}
-	\caption{Estimated overall effect. 
-	For extreme hot or cold temperature, estimated effects have quite large uncertainties.}
-	\label{figure:main}
-\end{figure}
-
 
 \section{Discussion}
 \label{section:discussion}
 
+In this article,
+the DLNM framework and Rubin causal model were compared
+to discover a causal link between the ambient temperature and all-cause mortality.
 In the extent of my knowledge, there has been no study analyzing the short term relationship 
 between the ambient temperature and the all-cause mortality using RCM.
-In this article, the causal link between the ambient temperature and mortality 
-was investigated under RCM.
-Consistency between new approach and existing regression method reinforced
-usefulness of regression method, and added an evidence of causal relationship found by previous studies.
-However, there are some unsolved limitations.
+Two pooled results obtained via two different methods
+showed similar effects of the ambient temperature, after smoothing.
+This similarity, or consistency
+added an evidence of causal relationship found by previous studies.
+
+(단점 나열, 어떻게 극복했는지)
 
 In RCM, we could not do several analyses that the DLNM framework can do:
 identification of the lagged effect, 
@@ -469,10 +477,8 @@ The exposure-response surface that the DLNM framework produces
 makes us possible to identify lagged effect of the ambient temperature.
 In contrast, RCM does not have ability to measure the lagged effect of the ambient temperature,
 since it does not use any information about lagged temperature.
-Actually, there is a method to measure the lagged effect\cite{bojinov2019}.
-However, that method is limited to binary (sequential) treatment,
-so the curse of dimension inhibits direct application of that method to our case.
-%(With maximum lag $L$, the number of combinations of possible treatment path is $2^{L+1}$ for binary case but there are more than $50$ categories of daily mean temperature so the number of treatment path exceeds $50^{L+1}$. Even if $L = 2$, the number of possible combinations of treatment assignment for 3 days exceeds the length of series $8000$. Note that we used $L = 21$ for the DLNM framework.)
+Indeed, there is a method to measure the lagged effect of binary treatment in RCM\cite{bojinov2019},
+but the curse of dimension inhibits direct application of that method to our case.
 \begin{comment}
 	%Controversial: 
 Someone may say to us that the calculated logRR curve does not represent overall effect 
@@ -502,25 +508,14 @@ In fact, multivariate meta-analysis is possible by considering bootstrap covaria
 but it is computationally too expensive.
 
 In addition to the weekness compared to the regression method stated above,
-our method has several disadvantages of itself to be addressed:
-incorrect treatment assignment mechanism, high variance, and violation of assumptions.
-
-IPW is a method to generate a pseudo-population with marginally randomized treatment
-from the data of conditionally randomized experiment.
-We insist that the daily mean temperature is conditionally randomized.
-Because from the viewpoint of the Earth, 
-the "assignment mechanism" of daily mean temperature is heavily dependent on the meridinal altitude.
-Moreover, the meridinal altitude is able to be predicted almost perfectly by the date.
-So, we can say that conditional on the date, daily mean temperature is randomly determined
-where the randomness comes from cloud, rain, air mass, typhoon, CO2 emission, global warming, etc.
-It would be very good if we can include those factors into our GPS model 
-to adjust for confounding bias of such meteorological variables,
-but it is impossible because of practical issue.
-Rather, by exploiting the fact that 
-there are so many factors that may have influence on daily mean temperature,
-we gave normal assumption on the distribution of daily mean temperature 
-based on the central limit theorem.
-
+our method has disadvantages of itself to be addressed:
+incorrect treatment assignment mechanism, and violation of assumptions.
+We predicted daily mean temperature with only date,
+in spite of the existence of other factors such as 
+cloud, rain, air mass, typhoon, CO2 emission, global warming, etc,
+because the primary factor that determines daily mean temperature is the meridinal altitude.
+So the assignment mechanism we assumed was theoretically incorrect,
+but can be improved by including other factors that are able to predict the temperature into GPS model.
 \begin{comment}
 	% variance-bias tradeoff, might be inappropriate
 We estimated logRR curve without any modeling assumption after confounding adjustment.
@@ -535,7 +530,6 @@ so effect estimates at extreme temperature is a result of borrowing information 
 and it makes extreme cases play somewhat shrinked role compared to our approach,
 which means lower variance and higher bias.
 \end{comment}
-
 There is a possibility of violation on 
 two key assumptions \ref{asm:positivity},\ref{asm:unconfoundedness} in RCM.
 The first one is positivity assumption
@@ -546,10 +540,10 @@ However those events rarely happen in reality,
 so stochastic positivity violation\cite{zivich2022} due to small sample size can happen.
 To fix the issue, we made normal assumption on gps,
 and trimmed very small probability to $0.1$ to ensure stability.
-The second one is unconfoundedness
+The second one is (weak) unconfoundedness
 that may be violated when there is an unmeasured confounder.
 In our case, we cannot measure everything related to temperature-mortality relationship
-so it is plausible to think unconfoundedness assumption is violated.
+so it is plausible to think the assumption \ref{asm:unconfoundedness} is violated.
 To overcome this issue, we should carefully think about confounding structure
 and collect more data of potential confounders.
 
