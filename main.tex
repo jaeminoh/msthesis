@@ -82,8 +82,9 @@ Rubin said, in the observational study,
 design stage that adjusts confounding bias and the analysis stage that relates treatments and outcomes
 should be separated to approximate the gold standard of causal inference, 
 the randomized experiment\cite{rubin2007sim}.
-However, regression methods, e.g., the DLNM framework mix two stages
-by fitting additional spline for each year to adjust for temporal confounding.
+However, regression methods mix two stages
+by including confounders as regressors to control their confounding bias,
+e.g., the DLNM framework eliminates seasonality by fitting additional spline basis for time.
 Moreover, the DLNM framework is susceptible to model selection problem\cite{gasparrini2016}
 since we don't know the exact placement of knots and the exact degrees of freedom.
 Therefore, we have to solve these issues first to make causal interpretation possible,
@@ -116,7 +117,7 @@ to analyze the temperature-mortality relationship in section \ref{section:discus
 \label{section:data}
 
 The data is composed of daily mean temperature in the first decimal place, and
-all-cause mortality count during the period from 1997 to 2018 across 36 regions in South Korea.
+daily all-cause death counts during the period from 1997 to 2018 across 36 regions in South Korea.
 Figure \ref{figure:temporal-trend}
 presents daily mean temperature and daily all-cause deaths in Seoul between 2010 and 2018.
 The daily mean temperature shows apparent seasonality and 
@@ -172,9 +173,10 @@ thus the design stage \& the analysis stage are mixed.
 \label{section:rcm}
 
 Now we introduce the notation of potential outcomes.
-$Y_t(w)$ refers to the outcome variable at time $t$
+$Y_t(w)$ refers to the potential outcome variable at time $t$
 that would have been observed under the treatment value $W_t = w$.
-$Y_t(w')$ is the outcome variable that would have been observed by the counterfactual imagination
+$Y_t(w')$ is the potential outcome variable 
+that would have been observed by the counterfactual imagination
 that $W_t = w'$ had been observed instead of $W_t = w$.
 Observed outcome $Y_t$ is equal to the potential outcome under observed treatment value, $Y_t(W_t)$.
 This is called consistency assumption \ref{asm:consistency}.
@@ -200,7 +202,7 @@ one can estimate causal estimand $\mu(w)$ by preprocessing the data to approxima
 e.g., inverse probability weighting, standardization, matching\cite{rosenbaum1983}.
 Note that we dropped the subscript $t$ to indicate a more general situation than the time-series setting.
 Throughout those techniques, 
-the fundamental assumptions that make it possible to estimate the causal estimand are below:
+the fundamental assumptions that make it possible to estimate the causal estimand $\mu(w)$ are below:
 
 \begin{asm}[Consistency]\label{asm:consistency}\hfill
 
@@ -243,7 +245,9 @@ the second equality comes from assumption \ref{asm:unconfoundedness},
 and the third equality is due to the definition of $p(w\lvert C_t)$.
 Thanks to the assumption \ref{asm:positivity}, we can divide by $p(w\lvert C_t)$.
 This is called "inverse probability weighting" (IPW)
-which is used to approximate randomized experiments from conditionally randomized experiments.
+which is used to approximate marginally randomized experiments
+in which all treatments have the same probability of occurrence
+from conditionally randomized experiments.
 Therefore, a natural estimator of the causal estimand is
 \[
 	\hat{\mu}(w) = \frac{1}{T}\sum_{t = 1}^T Y_t \frac{1_{(W_t = w)}}{p(w\lvert C_t)}.
@@ -288,10 +292,10 @@ We fitted the DLNM to our data to obtain region-specific effect estimates.
 Based on the previous study\cite{gasparrini2015},
 we used quadratic B-spline and placed knots at 10th, 75th, and 90th quantiles
 for temperature dimension,
-we considered $21$ lags, used natural B-spline, 
+we considered $L = 21$ lags, used natural B-spline, 
 and placed $3$ knots at equally spaced values in the log scale for lag dimension
 for lag dimension,
-we fitted additional natural B-spline with $8$ degrees of freedom for each year
+we fitted additional natural B-spline of dates with $8$ degrees of freedom for each year
 to eliminate seasonality,
 and indicator variables of the day of the week were included to control its effect.
 
@@ -310,33 +314,36 @@ See the upper left panel of figure \ref{figure:main}.
 
 \subsection{Rubin Causal Model}
 
-We rounded the daily mean temperature to an integer value.
-The first stage is the design stage to adjust for time confounding.
-We adjusted confounding bias by stabilized inverse probability weighting\cite{sipw2010}
-that assign weights
+We rounded daily mean temperatures to integer values.
+The first stage is the design stage to adjust for temporal confounding.
+The weight for confounding adjustment was 
+We weighted each observation by 
 \[
-	q_t = \min{ \left \{ \frac{\hat{p}(W_t)}{\hat{p}(W_t \lvert C_t)}, 10 \right \} }
+	q_t = \min{ \left \{ \frac{\hat{p}(W_t)}{\hat{p}(W_t \lvert C_t)}, 10 \right \} },
 \]
-to each observation.
-Here, we don't know true probability densities,
-so we should use estimated values.
-
+where the first term is called stabilized inverse probability weight\cite{sipw2010}
+that approximates a marginally randomized experiment
+in which each treatment has its relative frequency as the probability of assignment.
 To estimate $p(W_t \lvert C_t)$, 
-we assumed that 
+first we need to think about how daily mean temperature is determined.
+It would be very complicated, 
+but the main factor should be the meridional altitude
+which can be predicted very well by the date.
+There might be more predictors than the date,
+but we considered their influence as a Gaussian error based on the central limit theorem.
+Therefore, we assumed
 the conditional distribution of treatment conditioned on covariates is a normal distribution, 
 and estimated its mean and variance, i.e.
 \[ 
 	W_t\lvert C_t \sim N(m(C_t), \sigma(C_t)^2) 
 \] 
 where $m(C_t)$, and $\sigma(C_t)$ are some functions of $C_t$.
-There might be more predictors than the date,
-but we considered their influence as a Gaussian error based on the central limit theorem.
 The estimated mean $\hat{m}(C_t)$ was obtained by regressing $W_t$ on $C_t$ with boosting, 
 and the estimated standard deviation $\hat{\sigma}(C)$ was calculated
 by boosting residuals\cite{hirano2004, gpsboosting2015}.
 Hyperparameters such as depth of tree($3$), shrinkage($0.1$), and the number of trees($20$) 
 were determined heuristically to minimize the absolute correlation.
-As an estimate of $p(W_t)$, we used relative frequency as $\hat{p}(W_t)$.
+As an estimate of $p(W_t)$, we used relative frequency.
 One may use normal density with sample mean and sample variance too, but
 the weighting method with relative frequency achieved a lower absolute correlation in this application.
 See the second and third rows of Table 1.
