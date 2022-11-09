@@ -14,6 +14,7 @@
 
 %graphic
 \usepackage{graphicx}
+\usepackage{subcaption}
 
 %korean
 \usepackage{kotex}
@@ -67,7 +68,7 @@ the distributed lag nonlinear model (DLNM) framework\cite{dlnm2010}
 producing nonlinear exposure-response surface
 $\mu : (w, l) \mapsto \mu(w,l) \in \mathbb{R}$ where $w$ is the ambient temperature and $l$ is a time lag.
 In general, regression methods containing the DLNM framework have some advantages:
-identification of lagged effects and
+identifiability of lagged effects and
 low dimensional summary of estimated nonlinear exposure-response curve derived from the surface.
 These advantages make the regression approach popular in environmental epidemiology,
 especially for the topic of the temperature-mortality relationship.
@@ -84,7 +85,7 @@ should be separated to approximate the gold standard of causal inference,
 the randomized experiment\cite{rubin2007sim}.
 However, regression methods mix two stages
 by including confounders as regressors to control their confounding bias,
-e.g., the DLNM framework eliminates seasonality by fitting additional spline basis for time.
+e.g., the DLNM framework eliminates seasonality by fitting an additional spline basis for time.
 Moreover, the DLNM framework is susceptible to model selection problem\cite{gasparrini2016}
 since we don't know the exact placement of knots and the exact degrees of freedom.
 Therefore, we have to solve these issues first to make causal interpretation possible,
@@ -102,15 +103,16 @@ In this paper,
 we used RCM to estimate the log of relative risk (logRR) curve of the ambient temperature 
 and compared the result to the DLNM framework.
 
-\begin{comment}
-The paper proceeds as follows: 
-in Section \ref{section:method}, we describe the settings and assumptions of the potential outcome framework.
-In Section \ref{section:application}, 
-we apply the method suggested in section \ref{section:method} and regression method 
-to regional time-series data and compare the results.
-Finally, we discuss the pros and cons of the application of the potential outcome framework 
-to analyze the temperature-mortality relationship in section \ref{section:discussion}.
-\end{comment}
+The paper proceeds as follows.
+In section \ref{section:data}, we will provide the overview of the data used,
+in section \ref{section:method}, we describe the settings and assumptions of RCM,
+in section \ref{section:application}, 
+we apply the DLNM framework and RCM
+to regional time-series data respectively and compare the results,
+and finally in section \ref{section:discussion},
+we discuss the pros and cons of the application of the potential outcome framework 
+to analyze the temperature-mortality relationship.
+
 
 
 \section{Dataset}
@@ -118,7 +120,8 @@ to analyze the temperature-mortality relationship in section \ref{section:discus
 
 The data is composed of daily mean temperature in the first decimal place, and
 daily all-cause death counts during the period from 1997 to 2018 across 36 regions in South Korea.
-Figure \ref{figure:temporal-trend}
+Figure \ref{fig:regions} shows the locations of regions composing the data,
+and figure \ref{fig:temporal-trend}
 presents daily mean temperature and daily all-cause deaths in Seoul between 2010 and 2018.
 The daily mean temperature shows apparent seasonality and 
 the peaks are increasing due to global warming.
@@ -127,11 +130,19 @@ with an increase in cold seasons and a decrease in warm seasons.
 It shows a long-term increasing trend also.
 
 \begin{figure}
-	\includegraphics[width = \textwidth]{figures/temporal-trend.pdf}
-	\caption{
-		Daily times series of 
-		mean temperature (in Celcius) and all-cause death in Seoul from 2010 to 2018}
-	\label{figure:temporal-trend}
+	\centering
+	\begin{subfigure}[b]{0.5\textwidth}
+		\includegraphics[width = \textwidth]{figures/kor-map.pdf}
+		\caption{36 study regions in South Korea}
+		\label{fig:regions}
+	\end{subfigure}~%
+	\begin{subfigure}[b]{0.5\textwidth}
+		\includegraphics[width = \textwidth]{figures/temporal-trend.pdf}
+		\caption{Mean temperatures ($^\circ$C) and all-cause deaths in Seoul}
+		\label{fig:temporal-trend}
+	\end{subfigure}
+	\caption{Data description}
+	\label{fig:data}
 \end{figure}
 
 
@@ -150,22 +161,30 @@ Hereafter, we consider a fixed region and drop the subscript $i$ to simplify the
 
 In the DLNM framework,
 the temperature-mortality association is described by the equations
-\[
+\begin{equation}
 	\begin{split}
 		Y_t &\sim quasi-Possion(\lambda_t), \\
 		\log(\lambda_t) &= \alpha + cb(W_t, \dots, W_{t-L};\beta) + \eta(C_t; \gamma).
 	\end{split}
-\]
+	\label{eqn:dlnm}
+\end{equation}
 where $\lambda_t$ is the mean of 
 the Poisson distribution with overdispersion (namely, Quasi-Possion\cite{quasipoisson}),
 $cb$ is the cross-basis function with specified lag $L$,
 and $\eta$ is the spline basis.
 By maximizing the quasi-likelihood function, 
 we get estimates $\hat{\alpha}, \hat{\beta}$ and $\hat{\gamma}$.
+The logRR curve is obtained by
+\begin{equation}
+	w\mapsto cb(w, \dots, w;\hat{\beta}) - cb(w_0, \dots, w_0; \hat{\beta})
+	\label{eqn:dlnmlogrr}
+\end{equation}
+	
+where $w_0$ is the reference temperature.
 Here, we emphasize that 
 including $\eta$ in the model is equivalent to eliminating temporal trend in all-cause deaths
 to see the short-term variation,
-and fitting $cb$ function is estimating temperature effect,
+and fitting the $cb$ function is estimating temperature effect,
 thus the design stage \& the analysis stage are mixed.
 
 
@@ -183,17 +202,19 @@ This is called consistency assumption \ref{asm:consistency}.
 See the reference\cite{whatif2020} for a more detailed explanation of the definition.
 
 We might be interested in the individual risk ratio
-\[
+\begin{equation}
 	\frac{Y_t(w)}{Y_t(w')}
-\]
+	\label{eqn:individual risk ratio}
+\end{equation}	
 if we know true values of $Y_t(w)$ and $Y_t(w')$.
 However, we never know the true potential outcomes of unmeasured treatment, 
 due to its counterfactual nature.
 This is called the fundamental problem of causal inference\cite{holland1986}.
 Instead, we concentrate on the average risk ratio
-\[
+\begin{equation}
 	\frac{\mathbb{E}\left[ Y_t(w) \right]}{\mathbb{E}\left[ Y_t(w') \right]}.
-\]
+	\label{eqn:average risk ratio}
+\end{equation}
 There have been many studies to estimate $\mathbb{E}[Y_t(w)]$.
 In a marginally randomized experiment, 
 $\mu(w) = \mathbb{E}[Y(w)]$ can be estimated from observed data\cite{rubin1974}.
@@ -231,14 +252,16 @@ The weak unconfoundedness assumption,
 also known as "weak ignorability" or "selection on observables" in different contexts, says
 conditional on current confounders, the assignment mechanism is random to potential outcomes.
 Under these three assumptions, the causal estimand can be calculated as
-\[
+\begin{equation}
 	\begin{split}
 		\mathbb{E}\left[ Y_t\frac{1_{(W_t = w)}}{p(w\lvert C_t)} \right]
 		& = \mathbb{E}\left[ \mathbb{E}\left( Y_t(w) \frac{1_{(W_t = w)}}{p(w\lvert C_t)} \lvert C_t\right)\right]\\
 		& = \mathbb{E}\left[ Y_t(w)\frac{\mathbb{E}\left( 1_{(W_t = w)}\lvert C_t \right)}{p(w\lvert C_t)} \right]\\
 		& = \mathbb{E}\left[ Y_t(w) \right] = \mu(w),
 	\end{split}
-\]
+	\label{eqn:ipw}
+\end{equation}
+
 where $p$ is a mass or density function for discrete or continuous treatment respectively.
 The first equality comes from the iterated expectation formula and assumption \ref{asm:consistency},
 the second equality comes from assumption \ref{asm:unconfoundedness},
@@ -248,10 +271,12 @@ This is called "inverse probability weighting" (IPW)
 which is used to approximate marginally randomized experiments
 in which all treatments have the same probability of occurrence
 from conditionally randomized experiments.
-Therefore, a natural estimator of the causal estimand is
-\[
+Therefore, a natural estimator of the causal estimand $\mu(w)$ is
+\begin{equation}
 	\hat{\mu}(w) = \frac{1}{T}\sum_{t = 1}^T Y_t \frac{1_{(W_t = w)}}{p(w\lvert C_t)}.
-\]
+	\label{eqn:htestimator}
+\end{equation}
+	
 
 Still, we need to estimate $p(w\lvert C_t)$ since it is generally unknown to us.
 When the treatment is binary, $p(w\lvert C_t)$ is called propensity score,
@@ -259,7 +284,7 @@ and it is used to adjust for confounding bias\cite{rosenbaum1983}.
 The propensity score can be extended to 
 "generalized propensity score" (GPS) for categorical or continuous treatment\cite{imbens2000}.
 For binary treatment, one can estimate propensity score by fitting the logit model to data.
-For categorical or continuous treatment, GPS can be estimated by fitting the ordered probit model or boosting.
+GPS can be estimated by fitting the ordered probit model or boosting for categorical or continuous treatment.
 
 PS and GPS have two nice properties\cite{rosenbaum1983, hirano2004}.
 The first one is the balancing property, which means that conditional on the same PS (or GPS),
@@ -302,13 +327,14 @@ and indicator variables of the day of the week were included to control its effe
 With multiple effect estimates from various regions,
 we pooled those estimates by multivariate meta-analysis.
 We modeled effect estimates $\hat{\beta}_i$ from $i$-th region as a mixed-effect model
-\[
+\begin{equation}
 	\hat{\beta}_i \sim N_m(\beta, S_i + V)
-\]
+	\label{eqn:dlnmmeta}
+\end{equation}
 where $N_m$ denotes $m$-dimensional multivariate normal distribution,
 $S_i$ and $V$ are with-in and between study error covariances, respectively,
 and $\beta$ is the true aggregated effect.
-We used R package 'mixmeta' to estimate $\beta$ and its confidence interval.
+We used the R package 'mixmeta' to estimate $\beta$ and its confidence interval.
 See the upper left panel of figure \ref{figure:main}.
 
 
@@ -316,34 +342,36 @@ See the upper left panel of figure \ref{figure:main}.
 
 We rounded daily mean temperatures to integer values.
 The first stage is the design stage to adjust for temporal confounding.
-The weight for confounding adjustment was 
 We weighted each observation by 
-\[
+\begin{equation}
 	q_t = \min{ \left \{ \frac{\hat{p}(W_t)}{\hat{p}(W_t \lvert C_t)}, 10 \right \} },
-\]
+	\label{eqn:sipw}
+\end{equation}
 where the first term is called stabilized inverse probability weight\cite{sipw2010}
 that approximates a marginally randomized experiment
-in which each treatment has its relative frequency as the probability of assignment.
+in which each treatment has its marginal probability as the probability of assignment.
 To estimate $p(W_t \lvert C_t)$, 
-first we need to think about how daily mean temperature is determined.
+first, we need to think about how daily mean temperature is determined.
 It would be very complicated, 
 but the main factor should be the meridional altitude
 which can be predicted very well by the date.
 There might be more predictors than the date,
 but we considered their influence as a Gaussian error based on the central limit theorem.
 Therefore, we assumed
-the conditional distribution of treatment conditioned on covariates is a normal distribution, 
+the conditional distribution of the daily mean temperature conditioned on 
+the date is a normal distribution 
 and estimated its mean and variance, i.e.
-\[ 
+\begin{equation}
 	W_t\lvert C_t \sim N(m(C_t), \sigma(C_t)^2) 
-\] 
+	\label{eqn:gps}
+\end{equation}
 where $m(C_t)$, and $\sigma(C_t)$ are some functions of $C_t$.
 The estimated mean $\hat{m}(C_t)$ was obtained by regressing $W_t$ on $C_t$ with boosting, 
 and the estimated standard deviation $\hat{\sigma}(C)$ was calculated
 by boosting residuals\cite{hirano2004, gpsboosting2015}.
 Hyperparameters such as depth of tree($3$), shrinkage($0.1$), and the number of trees($20$) 
 were determined heuristically to minimize the absolute correlation.
-As an estimate of $p(W_t)$, we used relative frequency.
+We used relative frequency to estimate $p(W_t)$.
 One may use normal density with sample mean and sample variance too, but
 the weighting method with relative frequency achieved a lower absolute correlation in this application.
 See the second and third rows of Table 1.
@@ -382,47 +410,55 @@ See the table \ref{table:AC}.
 \label{table:AC}
 \end{table}
 
-The second stage is the analysis stage which relates treatments and outcomes with weights.
+The second stage is the analysis stage which relates
+the daily mean temperature and daily all-cause death counts with weights.
 We estimated the causal effect by the Horvitz-Thompson estimator with trimmed stabilized weights,
-\[
+\begin{equation}
 	\hat{\mu}(w) = \frac{\sum_{t = 1}^T q_t Y_t 1_{(W_t = w)}}{\sum_{t = 1}^T q_t 1_{(W_t = w)}}.
-\]
+	\label{eqn:rcmlogrr}
+\end{equation}
 
 To be consistent with previous studies and standardize different population sizes across regions,
-we calculated logRR curve by $\log\hat{\mu}(w) - \log \hat{\mu}(20)$ instead of risk difference.
+we calculated the logRR curve by $\log\hat{\mu}(w) - \log \hat{\mu}(20)$ instead of risk difference.
 However, there is no known result about the distribution of the estimator of the risk ratio.
-So we measured the uncertainty of logRR curve by Moving Block Bootstrapping (MBB)\cite{mbb1989}
+So we measured the uncertainty of the logRR curve by Moving Block Bootstrapping (MBB)\cite{mbb1989}
 with $2000$ bootstrap samples, $20$ blocks, and each block is length of $400$.
 In the bootstrap procedure, we did not fit the GPS model repeatedly for each bootstrap sample
 since we need to re-sample the pseudo-population itself that achieves covariate balance.
 
 To pool the estimates,
 we assumed $X_i = (Y_{i,t}, W_{i,t}, C_{i,t})_{t = 1}^T$ for $i = 1, \dots, N$ are independent
-and potential outcomes of one region are independent of other regions' potential outcomes and treatments.
+and potential outcomes of one region are independent 
+of other regions' potential outcomes and mean temperatures.
 
 We estimated $\hat{\mu}_i(w)$ for each region $i$ previously.
 To obtain the aggregated estimate, we assumed
-\[
+\begin{equation}
 	\hat{\mu}_i(w) = \mu(w) + \epsilon_i + \tau,
-\]
+	\label{eqn:rcmmeta}
+\end{equation}
 where $\epsilon_i \sim N(0, s_i)$ is within study error and $\tau \sim N(0, v)$ is between study error.
 $s_i$ is estimated by bootstrap,
 so the estimation of $v$ remains.
 We estimated $v$, and aggregated estimates from 36 regions
 by taking the weighted average of region-specific effect estimates
 where weight is inversely proportional to the variance $s_i + v$ of the estimator,
-\[
+\begin{equation}
 	\hat{\mu}(w) = \sum_{i = 1}^N \frac{\hat{\mu}_i(w)}{s_i + \hat{v}}
 	/\sum_{i = 1}^N \frac{1}{s_i + \hat{v}}.
-\]
+	\label{eqn:pooling}
+\end{equation}
+
 The precision of pooled estimator is the sum of the precisions of region-specific estimators,
-\[
+\begin{equation}
 	\frac{1}{\hat{\sigma}^2} = \sum_{i = 1}^N \frac{1}{s_i + \hat{v}}.
-\]
+	\label{eqn:pooled precision}
+\end{equation}
 Confidence interval is obtained by 
-\[
+\begin{equation}
 	\hat{\mu}(w) \pm 1.96 \hat{\sigma}.
-\]
+	\label{eqn:confidence interval}
+\end{equation}
 See the upper right panel of figure \ref{figure:main}.
 
 We could do multivariate meta-analysis like the DLNM framework with bootstrap covariance,
@@ -493,8 +529,8 @@ Indeed, there is a method to measure the lagged effect of binary treatment in RC
 but the curse of dimension inhibits the direct application of that method to our case.
 \begin{comment}
 	%Controversial: 
-Someone may say to us that the calculated logRR curve does not represent the overall effect 
-but represents the instant effect since we did not account for the lagged effect.
+Someone may say that the calculated logRR curve does not represent the overall effect 
+but the instant effect since we did not account for the lagged effect.
 However, under the assumption that 
 treatment history would have been almost the same during a short period, due to their high autocorrelation,
 our effect estimate represents the overall effect.
@@ -516,7 +552,7 @@ So the assignment mechanism we assumed was theoretically incorrect,
 but can be improved by including other factors that are able to predict the temperature in the GPS model.
 \begin{comment}
 	% variance-bias tradeoff might be inappropriate
-We estimated logRR curve without any modeling assumption after confounding adjustment.
+We estimated the logRR curve without any modeling assumption after confounding adjustment.
 Also, the estimator does not borrow information near the given treatment value.
 This makes the estimate solely rely on observed values.
 However, we have a few observations of extreme temperatures.
